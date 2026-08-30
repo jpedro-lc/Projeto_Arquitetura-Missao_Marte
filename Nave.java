@@ -7,6 +7,7 @@ public class Nave {
     private int y;
     private int capacidade;
     private List<Passageiro> passageiros = new ArrayList<>();
+    private int vidas = 3;
 
     public Nave(String id, int capacidade) {
         this.id = id;
@@ -32,5 +33,41 @@ public class Nave {
             return true;
         }
         return false;
+    }
+
+    public int getVidas() {
+        return vidas;
+    }
+
+    public void perderVida() {
+        vidas--;
+    }
+
+    /**
+     * Move a nave de acordo com o comando (w/s/a/d), respeitando os limites da grade.
+     */
+    public void moverComLimites(char comando, int minX, int maxX, int minY, int maxY) {
+        switch (comando) {
+            case 'w':
+                if (y > minY) {
+                    moveUp();
+                }
+                break;
+            case 's':
+                if (y < maxY) {
+                    moveDown();
+                }
+                break;
+            case 'a':
+                if (x > minX) {
+                    moveLeft();
+                }
+                break;
+            case 'd':
+                if (x < maxX) {
+                    moveRight();
+                }
+                break;
+        }
     }
 }

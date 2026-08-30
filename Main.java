@@ -11,182 +11,278 @@ import java.util.Scanner;
 import java.util.stream.Collectors;
 
 public class Main {
+    private static final Path RANKING_PATH = Paths.get("ranking.json");
+
     public static void main(String[] args) {
-        Random random = new Random();
-        int minX = -5;
-        int maxX = 5;
-        int minY = -5;
-        int maxY = 5;
-
-        Path rankingPath = Paths.get("ranking.json");
-        List<RankingEntry> ranking = loadRanking(rankingPath);
-
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Digite o nome do piloto: ");
-        String pilotoNome = scanner.nextLine().trim();
+        Random random = new Random();
+        List<RankingEntry> ranking = loadRanking(RANKING_PATH);
+
+        exibirBoasVindas();
+
+        boolean rodando = true;
+        while (rodando) {
+            exibirMenu();
+            String opcao = lerLinha(scanner, "Escolha uma opção: ", "1");
+            switch (opcao) {
+                case "1":
+                    jogarPartida(scanner, random, ranking);
+                    // Recarrega o ranking após a partida
+                    ranking = loadRanking(RANKING_PATH);
+                    break;
+                case "2":
+                    exibirRankingCompleto(ranking);
+                    break;
+                case "3":
+                    ranking = resetarRanking(scanner);
+                    break;
+                case "4":
+                    rodando = false;
+                    System.out.println("\nObrigado por jogar a Missão Marte Unifor!");
+                    break;
+                default:
+                    System.out.println("Opção inválida. Tente novamente.");
+            }
+        }
+        scanner.close();
+    }
+
+    private static void exibirBoasVindas() {
+        System.out.println("================================================================");
+        System.out.println("             MISSÃO MARTE UNIFOR - VERSÃO COMPLETA              ");
+        System.out.println("================================================================");
+    }
+
+    private static void exibirMenu() {
+        System.out.println("\n--- MENU PRINCIPAL ---");
+        System.out.println("1. Iniciar Nova Missão");
+        System.out.println("2. Visualizar Ranking Top 5");
+        System.out.println("3. Resetar Histórico de Ranking");
+        System.out.println("4. Sair do Jogo");
+        System.out.println("----------------------");
+    }
+
+    private static void jogarPartida(Scanner scanner, Random random, List<RankingEntry> ranking) {
+        String pilotoNome = lerLinha(scanner, "\nDigite o nome do piloto: ", "Piloto Anônimo");
         if (pilotoNome.isEmpty()) {
             pilotoNome = "Piloto Anônimo";
         }
 
-        System.out.println("================================================================");
-        System.out.println("Missão Marte Unifor — Console");
-        System.out.println();
-        System.out.println("Ranking dos melhores pilotos:");
-        if (ranking.isEmpty()) {
-            System.out.println(" - Ainda não há pontuações registradas.");
-        } else {
-            for (int i = 0; i < Math.min(5, ranking.size()); i++) {
-                RankingEntry entry = ranking.get(i);
-                System.out.printf(" %d. %s: %d pontos%n", i + 1, entry.name, entry.score);
-            }
-        }
+        Dificuldade dificuldade = lerDificuldade(scanner);
+        int tamanhoMapa = lerTamanhoMapa(scanner);
 
-        System.out.println();
-        System.out.println("Bem-vindo à Missão Marte Unifor! Sua nave foi selecionada para uma expedição de resgate e pesquisa na superfície marciana.");
-        System.out.println("Seu objetivo é localizar e embarcar todos os passageiros necessários para completar a missão antes que o seu tempo (pontuação) chegue a zero.");
-        System.out.println();
-        System.out.println("Objetivo:");
-        System.out.println(" - Mover a nave pelo mapa");
-        System.out.println(" - Encontrar e embarcar todos os passageiros");
-        System.out.println(" - Evitar colisões com asteroides");
-        System.out.println(" - Manter a pontuação acima de zero");
-        System.out.println();
-        System.out.println("Comandos:");
-        System.out.println(" - w: mover para cima");
-        System.out.println(" - s: mover para baixo");
-        System.out.println(" - a: mover para a esquerda");
-        System.out.println(" - d: mover para a direita");
-        System.out.println(" - c: embarcar passageiro na posição atual");
-        System.out.println(" - q: sair do jogo");
-        System.out.println();
-        System.out.println("Pontuação inicial: 20 pontos. Cada movimento custa 1 ponto. Cada embarque vale +10 pontos.");
-        System.out.println();
-        System.out.println("Pressione Enter para iniciar a missão...");
+        int minX = -tamanhoMapa;
+        int maxX = tamanhoMapa;
+        int minY = -tamanhoMapa;
+        int maxY = tamanhoMapa;
+
+        System.out.println("\nDecolagem em 3... 2... 1... Pressione Enter para iniciar!");
         scanner.nextLine();
-        System.out.println("================================================================");
 
-        boolean playAgain = true;
-        while (playAgain) {
-            Missao missao = criarNovaMissao(random, minX, maxX, minY, maxY);
-            Nave nave = missao.getNave();
-            int score = 20;
-            boolean running = true;
+        Missao missao = criarNovaMissao(random, minX, maxX, minY, maxY, dificuldade);
+        Nave nave = missao.getNave();
+        int score = definirPontuacaoInicial(dificuldade);
+        int movimentos = 0;
+        boolean partidaAtiva = true;
 
-            while (running) {
-                desenharMapa(missao, -5, 5, -5, 5, score, pilotoNome);
-                System.out.printf("Nave em (%d,%d) | Pontos: %d | Passageiros a bordo: %d | Passageiros restantes: %d\n",
-                        nave.getX(), nave.getY(), score, nave.getPassageiros().size(), missao.todosEmbarcados() ? 0 : missao.getPassageiros().size());
+        long tempoInicio = System.currentTimeMillis();
 
-                if (missao.verificaColisao()) {
-                    System.out.println("Colisão com asteroide! Missão abortada.");
-                    break;
-                }
+        while (partidaAtiva) {
+            desenharMapa(missao, minX, maxX, minY, maxY, score, pilotoNome);
+            System.out.printf("Nave em (%d,%d) | Pontos: %d | Vidas: %d | A bordo: %d/%d | Restantes: %d%n",
+                    nave.getX(), nave.getY(), score, nave.getVidas(),
+                    nave.getPassageiros().size(), nave.getCapacidade(),
+                    missao.todosEmbarcados() ? 0 : missao.getPassageiros().size());
 
-                System.out.print("Para onde ir? ");
-                String line = scanner.nextLine().trim().toLowerCase();
-                if (line.isEmpty()) continue;
-                char cmd = line.charAt(0);
-                switch (cmd) {
-                    case 'w': nave.moveUp(); score--; break;
-                    case 's': nave.moveDown(); score--; break;
-                    case 'a': nave.moveLeft(); score--; break;
-                    case 'd': nave.moveRight(); score--; break;
-                    case 'c': {
-                        Passageiro p = missao.passagemNaPosicao();
-                        if (p == null) {
-                            System.out.println("Nenhum passageiro nesta posição.");
-                        } else {
-                            boolean ok = missao.embarcarPassageiroNaPosicao();
-                            if (ok) {
-                                score += 10;
-                                System.out.println("Passageiro embarcado. +10 pontos!");
-                            } else {
-                                System.out.println("Nave cheia, não foi possível embarcar.");
-                            }
-                        }
-                        break;
+            String comandoStr = lerLinha(scanner, "Comando (w/s/a/d/c/q): ", "").toLowerCase();
+            if (comandoStr.isEmpty()) continue;
+
+            char cmd = comandoStr.charAt(0);
+            if (cmd == 'q') {
+                System.out.println("Missão abortada.");
+                partidaAtiva = false;
+                break;
+            } else if (cmd == 'c') {
+                Passageiro p = missao.passagemNaPosicao();
+                if (p == null) {
+                    System.out.println("Nenhum passageiro nesta posição.");
+                } else {
+                    boolean embarcou = missao.embarcarPassageiroNaPosicao();
+                    if (embarcou) {
+                        int bonus = p.getPontuacao();
+                        score += bonus;
+                        System.out.printf("Passageiro %s embarcado! +%d pontos!%n", p.getNome(), bonus);
+                    } else {
+                        System.out.println("Nave cheia! Não foi possível embarcar.");
                     }
-                    case 'q': running = false; break;
-                    default: System.out.println("Comando desconhecido.");
                 }
+            } else if (cmd == 'w' || cmd == 's' || cmd == 'a' || cmd == 'd') {
+                // Utiliza os limites definidos para o mapa
+                nave.moverComLimites(cmd, minX, maxX, minY, maxY);
+                score--;
+                movimentos++;
+            } else {
+                System.out.println("Comando desconhecido.");
+                continue;
+            }
 
-                if (score <= 0) {
-                    System.out.println("Pontuação zerada. Missão perdida.");
-                    break;
+            // Atualiza posição dos inimigos
+            missao.moverInimigos(random, minX, maxX, minY, maxY);
+
+            // Verifica colisões com perigos
+            if (missao.verificaColisao()) {
+                nave.perderVida();
+                if (nave.getVidas() > 0) {
+                    System.out.printf("Colisão! Vidas restantes: %d%n", nave.getVidas());
+                } else {
+                    System.out.println("GAME OVER! A nave foi destruída por completo.");
+                    partidaAtiva = false;
                 }
+            }
 
-                if (missao.todosEmbarcados()) {
-                    System.out.println("Todos os passageiros embarcados! Missão concluída com sucesso.");
-                    System.out.printf("Pontuação final: %d\n", score);
+            // Sem energia/pontos
+            if (score <= 0) {
+                System.out.println("Pontuação zerada. Fim de missão por falta de combustível.");
+                partidaAtiva = false;
+            }
+
+            // Verificar vitória (todos resgatados E nave retornou à Plataforma de Pouso em (0,0))
+            if (missao.todosEmbarcados() && partidaAtiva) {
+                if (nave.getX() == 0 && nave.getY() == 0) {
+                    long tempoFim = System.currentTimeMillis();
+                    long tempoJogoSegundos = (tempoFim - tempoInicio) / 1000;
+
+                    System.out.println("\n================================================================");
+                    System.out.println("🚀 DECOLAGEM AUTORIZADA! Nave acoplada à plataforma em (0,0).");
+                    System.out.println("Retornando à órbita marciana com todos os passageiros. Missão cumprida!");
+                    System.out.println("================================================================");
+                    exibirEstatisticas(score, movimentos, tempoJogoSegundos, nave.getPassageiros().size(), ranking);
+
                     if (score > 0 && isTopScore(ranking, score)) {
-                        ranking.add(new RankingEntry(pilotoNome, score));
-                        ranking = ranking.stream()
+                        RankingEntry novaEntrada = new RankingEntry(
+                                pilotoNome,
+                                score,
+                                dificuldade,
+                                nave.getPassageiros().size(),
+                                java.time.LocalDateTime.now().toString().substring(0, 19).replace('T', ' '),
+                                tempoJogoSegundos
+                        );
+                        ranking.add(novaEntrada);
+                        List<RankingEntry> rankingFiltrado = ranking.stream()
                                 .sorted(Comparator.comparingInt((RankingEntry e) -> e.score).reversed())
                                 .limit(5)
                                 .collect(Collectors.toList());
-                        saveRanking(rankingPath, ranking);
-                        System.out.println("Novo ranking salvo! Você está entre os 5 maiores pontuadores.");
+                        saveRanking(RANKING_PATH, rankingFiltrado);
+                        System.out.println("Parabéns! Novo registro salvo no ranking!");
                     }
-                    break;
+                    partidaAtiva = false;
+                } else {
+                    System.out.println("✨ ALERTA: Todos os passageiros resgatados! Retorne para a Plataforma de Pouso 'L' em (0,0) para completar a missão.");
                 }
             }
-
-            if (!ranking.isEmpty()) {
-                System.out.println();
-                System.out.println("Ranking Top 5:");
-                printRanking(ranking);
-            } else {
-                System.out.println();
-                System.out.println("Ranking vazio. Seja o primeiro a marcar pontos!");
-            }
-
-            System.out.print("Deseja iniciar nova missão? (s/n): ");
-            String resposta = scanner.nextLine().trim().toLowerCase();
-            if (resposta.equals("s") || resposta.equals("sim")) {
-                System.out.println("Preparando nova missão...");
-            } else {
-                playAgain = false;
-            }
-        }
-
-        scanner.close();
-        System.out.println("Fim da execução.");
-    }
-
-    private static void printRanking(List<RankingEntry> ranking) {
-        int position = 1;
-        for (RankingEntry entry : ranking) {
-            System.out.printf("%d. %s - %d pontos%n", position++, entry.name, entry.score);
         }
     }
 
-    private static Missao criarNovaMissao(Random random, int minX, int maxX, int minY, int maxY) {
+    private static void exibirEstatisticas(int score, int movimentos, long tempoSegundos, int passageiros, List<RankingEntry> ranking) {
+        System.out.println("\n================ ESTATÍSTICAS ================");
+        System.out.printf(" - Pontuação Concluída: %d pontos%n", score);
+        System.out.printf(" - Movimentos Efetuados: %d%n", movimentos);
+        System.out.printf(" - Duração da Partida: %d segundos%n", tempoSegundos);
+        System.out.printf(" - Passageiros Coletados: %d%n", passageiros);
+
+        int recorde = ranking.isEmpty() ? 0 : ranking.get(0).score;
+        if (score > recorde && recorde > 0) {
+            System.out.println("🏆 Novo Recorde do Servidor!");
+        } else if (recorde > 0) {
+            System.out.printf(" - Recorde atual: %d pontos (Piloto: %s)%n", recorde, ranking.get(0).name);
+        }
+        System.out.println("==============================================");
+    }
+
+    private static Dificuldade lerDificuldade(Scanner scanner) {
+        System.out.print("Escolha a Dificuldade (facil/medio/dificil): ");
+        String difStr = lerLinha(scanner, "", "medio");
+        return Dificuldade.deString(difStr);
+    }
+
+    private static int lerTamanhoMapa(Scanner scanner) {
+        try {
+            int tamanho = Integer.parseInt(lerLinha(scanner, "Tamanho do mapa (ex: 5 para mapa de -5 a +5): ", "5"));
+            return tamanho > 0 ? tamanho : 5;
+        } catch (NumberFormatException e) {
+            System.out.println("Entrada inválida. Usando mapa padrão (5).");
+            return 5;
+        }
+    }
+
+    private static int definirPontuacaoInicial(Dificuldade dificuldade) {
+        switch (dificuldade) {
+            case FACIL: return 30;
+            case DIFICIL: return 15;
+            default: return 20;
+        }
+    }
+
+    private static Missao criarNovaMissao(Random random, int minX, int maxX, int minY, int maxY, Dificuldade dificuldade) {
         Nave nave = new Nave("A-1", 5);
         Missao missao = new Missao(nave);
 
-        while (missao.getPassageiros().size() < 3) {
-            int x = random.nextInt(maxX - minX + 1) + minX;
-            int y = random.nextInt(maxY - minY + 1) + minY;
-            if (x == nave.getX() && y == nave.getY()) continue;
-            if (posicaoOcupada(missao, x, y)) continue;
-            if (missao.getPassageiros().isEmpty()) {
-                missao.addPassageiro(new Professor("Dr. Silva", x, y));
-            } else if (missao.getPassageiros().size() == 1) {
-                missao.addPassageiro(new Engenheiro("Eng. Rosa", x, y));
-            } else {
-                missao.addPassageiro(new Professor("Dr. Lima", x, y));
-            }
+        int qtdPassageiros = 5;
+        int qtdAsteroides = 2;
+        int qtdInimigos = 2;
+
+        if (dificuldade == Dificuldade.FACIL) {
+            qtdPassageiros = 4;
+            qtdAsteroides = 1;
+            qtdInimigos = 1;
+        } else if (dificuldade == Dificuldade.DIFICIL) {
+            qtdPassageiros = 5;
+            qtdAsteroides = 3;
+            qtdInimigos = 3;
         }
 
-        while (missao.getAsteroides().size() < 2) {
+        // Adicionar passageiros aleatórios
+        while (missao.getPassageiros().size() < qtdPassageiros) {
             int x = random.nextInt(maxX - minX + 1) + minX;
             int y = random.nextInt(maxY - minY + 1) + minY;
             if (x == nave.getX() && y == nave.getY()) continue;
             if (posicaoOcupada(missao, x, y)) continue;
+
+            int index = missao.getPassageiros().size();
+            missao.addPassageiro(criarPassageiroPolimorfico(index, x, y));
+        }
+
+        // Adicionar asteroides aleatórios
+        while (missao.getAsteroides().size() < qtdAsteroides) {
+            int x = random.nextInt(maxX - minX + 1) + minX;
+            int y = random.nextInt(maxY - minY + 1) + minY;
+            if (x == nave.getX() && y == nave.getY()) continue;
+            if (posicaoOcupada(missao, x, y)) continue;
+
             missao.addAsteroide(new Asteroide(x, y));
         }
 
+        // Adicionar inimigos aleatórios
+        while (missao.getInimigos().size() < qtdInimigos) {
+            int x = random.nextInt(maxX - minX + 1) + minX;
+            int y = random.nextInt(maxY - minY + 1) + minY;
+            if (x == nave.getX() && y == nave.getY()) continue;
+            if (posicaoOcupada(missao, x, y)) continue;
+
+            missao.addInimigo(new Inimigo(x, y));
+        }
+
         return missao;
+    }
+
+    private static Passageiro criarPassageiroPolimorfico(int indice, int x, int y) {
+        switch (indice % 5) {
+            case 0: return new Professor("Dr. Silva", x, y);
+            case 1: return new Engenheiro("Eng. Rosa", x, y);
+            case 2: return new Professor("Dr. Lima", x, y);
+            case 3: return new Engenheiro("Eng. Carlos", x, y);
+            default: return new Astronauta("Ast. Maria", x, y);
+        }
     }
 
     private static boolean posicaoOcupada(Missao missao, int x, int y) {
@@ -196,6 +292,9 @@ public class Main {
         }
         for (Asteroide a : missao.getAsteroides()) {
             if (a.getX() == x && a.getY() == y) return true;
+        }
+        for (Inimigo i : missao.getInimigos()) {
+            if (i.getX() == x && i.getY() == y) return true;
         }
         return false;
     }
@@ -225,6 +324,8 @@ public class Main {
                         if (p.getX() == x && p.getY() == y) {
                             if (p instanceof Engenheiro) {
                                 symbol = 'E';
+                            } else if (p instanceof Astronauta) {
+                                symbol = 'T';
                             } else {
                                 symbol = 'P';
                             }
@@ -239,19 +340,65 @@ public class Main {
                             }
                         }
                     }
+                    if (symbol == '.') {
+                        for (Inimigo i : missao.getInimigos()) {
+                            if (i.getX() == x && i.getY() == y) {
+                                symbol = 'X';
+                                break;
+                            }
+                        }
+                    }
+                    if (symbol == '.' && x == 0 && y == 0) {
+                        symbol = 'L'; // L para Plataforma de Pouso (Landing Pad)
+                    }
                 }
                 System.out.printf(" %2c", symbol);
             }
             System.out.println();
         }
 
-        System.out.println("Legenda: N=Nave, P=Professor, E=Engenheiro, A=Asteroide, .=Vazio");
-        System.out.println("Resumo de comandos: w(cima)/s(baixo)/a(esquerda)/d(direita) mover, c embarcar, q sair");
-        System.out.println("Passageiros restantes:");
-        for (Passageiro p : missao.getPassageiros()) {
-            System.out.printf(" - %s (%s) em (%d,%d)\n", p.getNome(), p.getTipo(), p.getX(), p.getY());
+        System.out.println("Legenda: @=Nave, P=Professor, E=Engenheiro, T=Astronauta, #=Asteroide, X=Inimigo, L=Plataforma de Pouso, .=Vazio");
+        System.out.println("Comandos: w/s/a/d (mover), c (embarcar), q (sair)");
+    }
+
+    private static String lerLinha(Scanner scanner, String prompt, String fallback) {
+        if (prompt != null && !prompt.isEmpty()) {
+            System.out.print(prompt);
         }
-        System.out.println();
+        if (scanner.hasNextLine()) {
+            return scanner.nextLine().trim();
+        }
+        return fallback;
+    }
+
+    private static void exibirRankingCompleto(List<RankingEntry> ranking) {
+        System.out.println("\n====== RANKING TOP 5 PILOTOS ======");
+        if (ranking.isEmpty()) {
+            System.out.println(" - Nenhum registro encontrado. Seja o primeiro a jogar!");
+        } else {
+            int pos = 1;
+            for (RankingEntry entry : ranking) {
+                System.out.printf("%d. %s - %d pts | Dificuldade: %s | Coletados: %d | Tempo: %ds | %s%n",
+                        pos++, entry.name, entry.score, entry.dificuldade, entry.passageirosColetados, entry.tempoJogo, entry.dataHora);
+            }
+        }
+        System.out.println("===================================");
+    }
+
+    private static List<RankingEntry> resetarRanking(Scanner scanner) {
+        System.out.print("Você realmente deseja limpar o histórico de ranking? (s/n): ");
+        String confirmacao = lerLinha(scanner, "", "n").toLowerCase();
+        if (confirmacao.equals("s") || confirmacao.equals("sim")) {
+            try {
+                Files.deleteIfExists(RANKING_PATH);
+                System.out.println("Histórico de ranking resetado!");
+            } catch (IOException e) {
+                System.out.println("Erro ao deletar ranking: " + e.getMessage());
+            }
+            return new ArrayList<>();
+        }
+        System.out.println("Operação cancelada.");
+        return loadRanking(RANKING_PATH);
     }
 
     private static boolean isTopScore(List<RankingEntry> ranking, int score) {
@@ -282,6 +429,14 @@ public class Main {
                     .append(entry.name.replace("\"", "\\\""))
                     .append("\",\"score\":")
                     .append(entry.score)
+                    .append(",\"dificuldade\":\"")
+                    .append(entry.dificuldade.name())
+                    .append("\",\"passageirosColetados\":")
+                    .append(entry.passageirosColetados)
+                    .append(",\"dataHora\":\"")
+                    .append(entry.dataHora)
+                    .append("\",\"tempoJogo\":")
+                    .append(entry.tempoJogo)
                     .append("}");
             if (i < ranking.size() - 1) {
                 builder.append(",");
@@ -317,11 +472,17 @@ public class Main {
             String object = json.substring(start + 1, end);
             String name = null;
             Integer score = null;
+            Dificuldade dificuldade = Dificuldade.MEDIO;
+            Integer passageirosColetados = 0;
+            String dataHora = "";
+            long tempoJogo = 0;
+
             for (String part : object.split(",")) {
                 String[] pair = part.split(":", 2);
                 if (pair.length != 2) continue;
                 String key = pair[0].trim().replaceAll("\"", "");
                 String value = pair[1].trim();
+
                 if (key.equals("name")) {
                     if (value.startsWith("\"") && value.endsWith("\"")) {
                         name = value.substring(1, value.length() - 1).replace("\\\"", "\"");
@@ -329,12 +490,27 @@ public class Main {
                 } else if (key.equals("score")) {
                     try {
                         score = Integer.parseInt(value);
-                    } catch (NumberFormatException ignored) {
+                    } catch (NumberFormatException ignored) {}
+                } else if (key.equals("dificuldade")) {
+                    if (value.startsWith("\"") && value.endsWith("\"")) {
+                        dificuldade = Dificuldade.deString(value.substring(1, value.length() - 1));
                     }
+                } else if (key.equals("passageirosColetados")) {
+                    try {
+                        passageirosColetados = Integer.parseInt(value);
+                    } catch (NumberFormatException ignored) {}
+                } else if (key.equals("dataHora")) {
+                    if (value.startsWith("\"") && value.endsWith("\"")) {
+                        dataHora = value.substring(1, value.length() - 1);
+                    }
+                } else if (key.equals("tempoJogo")) {
+                    try {
+                        tempoJogo = Long.parseLong(value);
+                    } catch (NumberFormatException ignored) {}
                 }
             }
             if (name != null && score != null) {
-                ranking.add(new RankingEntry(name, score));
+                ranking.add(new RankingEntry(name, score, dificuldade, passageirosColetados, dataHora, tempoJogo));
             }
             index = end + 1;
         }
@@ -346,10 +522,18 @@ public class Main {
     private static class RankingEntry {
         private final String name;
         private final int score;
+        private final Dificuldade dificuldade;
+        private final int passageirosColetados;
+        private final String dataHora;
+        private final long tempoJogo;
 
-        private RankingEntry(String name, int score) {
+        private RankingEntry(String name, int score, Dificuldade dificuldade, int passageirosColetados, String dataHora, long tempoJogo) {
             this.name = name;
             this.score = score;
+            this.dificuldade = dificuldade;
+            this.passageirosColetados = passageirosColetados;
+            this.dataHora = dataHora;
+            this.tempoJogo = tempoJogo;
         }
     }
 }
