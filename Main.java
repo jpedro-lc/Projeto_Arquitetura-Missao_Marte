@@ -161,7 +161,7 @@ public class Main {
     }
 
     private static Missao criarNovaMissao(Random random, int minX, int maxX, int minY, int maxY) {
-        Nave nave = new Nave("A-1", 3);
+        Nave nave = new Nave("A-1", 5);
         Missao missao = new Missao(nave);
 
         while (missao.getPassageiros().size() < 3) {
@@ -219,7 +219,7 @@ public class Main {
             for (int x = minX; x <= maxX; x++) {
                 char symbol = '.';
                 if (missao.getNave().getX() == x && missao.getNave().getY() == y) {
-                    symbol = 'N';
+                    symbol = '@';
                 } else {
                     for (Passageiro p : missao.getPassageiros()) {
                         if (p.getX() == x && p.getY() == y) {
@@ -234,7 +234,7 @@ public class Main {
                     if (symbol == '.') {
                         for (Asteroide a : missao.getAsteroides()) {
                             if (a.getX() == x && a.getY() == y) {
-                                symbol = 'A';
+                                symbol = '#';
                                 break;
                             }
                         }
