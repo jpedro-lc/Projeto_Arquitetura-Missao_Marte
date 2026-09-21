@@ -1,3 +1,5 @@
+package missao1;
+
 public class Asteroide {
     private int x;
     private int y;

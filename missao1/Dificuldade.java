@@ -1,3 +1,5 @@
+package missao1;
+
 public enum Dificuldade {
     FACIL, MEDIO, DIFICIL;
 

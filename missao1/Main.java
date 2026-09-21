@@ -1,3 +1,5 @@
+package missao1;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -89,7 +91,7 @@ public class Main {
 
         while (partidaAtiva) {
             desenharMapa(missao, minX, maxX, minY, maxY, score, pilotoNome);
-            System.out.printf("Nave em (%d,%d) | Pontos: %d | Vidas: %d | A bordo: %d/%d | Restantes: %d%n",
+            System.out.printf("missao1.Nave em (%d,%d) | Pontos: %d | Vidas: %d | A bordo: %d/%d | Restantes: %d%n",
                     nave.getX(), nave.getY(), score, nave.getVidas(),
                     nave.getPassageiros().size(), nave.getCapacidade(),
                     missao.todosEmbarcados() ? 0 : missao.getPassageiros().size());
@@ -111,9 +113,9 @@ public class Main {
                     if (embarcou) {
                         int bonus = p.getPontuacao();
                         score += bonus;
-                        System.out.printf("Passageiro %s embarcado! +%d pontos!%n", p.getNome(), bonus);
+                        System.out.printf("missao1.Passageiro %s embarcado! +%d pontos!%n", p.getNome(), bonus);
                     } else {
-                        System.out.println("Nave cheia! Não foi possível embarcar.");
+                        System.out.println("missao1.Nave cheia! Não foi possível embarcar.");
                     }
                 }
             } else if (cmd == 'w' || cmd == 's' || cmd == 'a' || cmd == 'd') {
@@ -153,7 +155,7 @@ public class Main {
                     long tempoJogoSegundos = (tempoFim - tempoInicio) / 1000;
 
                     System.out.println("\n================================================================");
-                    System.out.println("🚀 DECOLAGEM AUTORIZADA! Nave acoplada à plataforma em (0,0).");
+                    System.out.println("🚀 DECOLAGEM AUTORIZADA! missao1.Nave acoplada à plataforma em (0,0).");
                     System.out.println("Retornando à órbita marciana com todos os passageiros. Missão cumprida!");
                     System.out.println("================================================================");
                     exibirEstatisticas(score, movimentos, tempoJogoSegundos, nave.getPassageiros().size(), ranking);
@@ -200,7 +202,7 @@ public class Main {
     }
 
     private static Dificuldade lerDificuldade(Scanner scanner) {
-        System.out.print("Escolha a Dificuldade (facil/medio/dificil): ");
+        System.out.print("Escolha a missao1.Dificuldade (facil/medio/dificil): ");
         String difStr = lerLinha(scanner, "", "medio");
         return Dificuldade.deString(difStr);
     }
@@ -357,7 +359,7 @@ public class Main {
             System.out.println();
         }
 
-        System.out.println("Legenda: @=Nave, P=Professor, E=Engenheiro, T=Astronauta, #=Asteroide, X=Inimigo, L=Plataforma de Pouso, .=Vazio");
+        System.out.println("Legenda: @=missao1.Nave, P=missao1.Professor, E=missao1.Engenheiro, T=missao1.Astronauta, #=missao1.Asteroide, X=missao1.Inimigo, L=Plataforma de Pouso, .=Vazio");
         System.out.println("Comandos: w/s/a/d (mover), c (embarcar), q (sair)");
     }
 
@@ -378,7 +380,7 @@ public class Main {
         } else {
             int pos = 1;
             for (RankingEntry entry : ranking) {
-                System.out.printf("%d. %s - %d pts | Dificuldade: %s | Coletados: %d | Tempo: %ds | %s%n",
+                System.out.printf("%d. %s - %d pts | missao1.Dificuldade: %s | Coletados: %d | Tempo: %ds | %s%n",
                         pos++, entry.name, entry.score, entry.dificuldade, entry.passageirosColetados, entry.tempoJogo, entry.dataHora);
             }
         }

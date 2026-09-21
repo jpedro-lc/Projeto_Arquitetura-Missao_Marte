@@ -1,3 +1,5 @@
+package missao1;
+
 public class Cachorro {
     private String nome;
     private String raca;

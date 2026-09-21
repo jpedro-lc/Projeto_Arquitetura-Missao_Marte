@@ -1,3 +1,5 @@
+package missao1;
+
 public class Passageiro {
     private String nome;
     private String tipo;
