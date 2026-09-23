@@ -7,7 +7,7 @@ Este documento apresenta a análise crítica, avaliação de decisões de projet
 ## 1. Análise dos Princípios SOLID
 
 ### Princípio da Responsabilidade Única (SRP)
-* **Local:** Pacote `solidexercicio10.presentation` (classe `ConsoleUi` / `MapaRenderer`)
+* **Local:** Pacote `solidexercicio10.presentation` (classe `MapaRenderer`)
 * **Princípio relacionado:** SRP (Single Responsibility Principle)
 * **Observação:** No código monolítico original, a classe `Main.java` cuidava do loop do jogo, leitura de input, desenho do mapa em caracteres ASCII e parseamento de arquivo JSON do ranking. A refatoração isolou o desenho do mapa e as mensagens de terminal na camada de apresentação (`presentation`).
 * **Impacto para manutenção, testes ou evolução:** Reduz drasticamente a necessidade de alterar classes de serviço ou domínio se mudarmos o formato de interface (por exemplo, de terminal para uma GUI em JavaFX ou Swing).
