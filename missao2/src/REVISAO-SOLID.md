@@ -1,6 +1,6 @@
-# Relatório de Revisão Crítica - Refatoração SOLID (Missão Marte Unifor)
+# Relatório de Revisão Crítica - Refatoração SOLID (Missão Marte)
 
-Este documento apresenta a análise crítica, avaliação de decisões de projeto, resultados de testes e propostas de melhoria para a refatoração do projeto **Missão Marte Unifor**, migrado do código monolítico inicial para o pacote `solidexercicio10`.
+Este documento apresenta a análise crítica, avaliação de decisões de projeto, resultados de testes e propostas de melhoria para a refatoração do projeto **Missão Marte**, migrado do código monolítico inicial para o pacote `solidexercicio10`.
 
 ---
 
