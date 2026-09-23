@@ -9,8 +9,8 @@ Este documento apresenta a análise crítica, avaliação de decisões de projet
 ### Princípio da Responsabilidade Única (SRP)
 * **Local:** Pacote `solidexercicio10.presentation` (classe `MapaRenderer`)
 * **Princípio relacionado:** SRP (Single Responsibility Principle)
-* **Observação:** No código monolítico original, a classe `Main.java` cuidava do loop do jogo, leitura de input, desenho do mapa em caracteres ASCII e parseamento de arquivo JSON do ranking. A refatoração isolou o desenho do mapa e as mensagens de terminal na camada de apresentação (`presentation`).
-* **Impacto para manutenção, testes ou evolução:** Reduz drasticamente a necessidade de alterar classes de serviço ou domínio se mudarmos o formato de interface (por exemplo, de terminal para uma GUI em JavaFX ou Swing).
+* **Observação:** No código original, a classe `Main.java` cuidava do loop do jogo, leitura de input, desenho do mapa em caracteres e parseamento de arquivo JSON do ranking. A refatoração isolou o desenho do mapa e as mensagens de terminal na camada de apresentação (`presentation`).
+* **Impacto para manutenção, testes ou evolução:** Reduz drasticamente a necessidade de alterar classes de serviço ou domínio se mudarmos o formato de interface.
 * **Proposta:** Manter o isolamento estrito: a camada de visualização apenas recebe os dados do estado da missão e exibe na tela, sem realizar operações lógicas do jogo.
 * **Prioridade:** Alta
 
@@ -19,7 +19,7 @@ Este documento apresenta a análise crítica, avaliação de decisões de projet
 ### Princípio do Aberto/Fechado (OCP)
 * **Local:** Pacote `solidexercicio10.model` e classe `JogoService`
 * **Princípio relacionado:** OCP (Open/Closed Principle)
-* **Observação:** A verificação do tipo de passageiro e a pontuação concedida ao embarcar utilizavam verificações condicionais explícitas (`instanceof`) no código original. Com a refatoração, o método de pontuação e comportamento foi encapsulado no polimorfismo das subclasses da classe base `Passageiro`.
+* **Observação:** A verificação do tipo de passageiro e a pontuação concedida ao embarcar utilizavam verificações condicionais explícitas (`instanceof`) no código original. Com a refatoração, o método de pontuação e o símbolo foi encapsulado no polimorfismo das subclasses da classe base `Passageiro`.
 * **Impacto para manutenção, testes ou evolução:** Permite a adição de novos tipos de passageiros (ex: `Cientista`, `Medico`) apenas estendendo a classe base `Passageiro`, sem a necessidade de modificar estruturas `switch` ou `if/else` dentro do loop principal da partida.
 * **Proposta:** Garantir que factory methods ou enumerações controladas cuidem da instanciação dos novos passageiros sem acoplar a lógica de negócio à criação de instâncias.
 * **Prioridade:** Média
@@ -39,7 +39,7 @@ Este documento apresenta a análise crítica, avaliação de decisões de projet
 ### Princípio da Segregação de Interfaces (ISP)
 * **Local:** Pacote `solidexercicio10.repository` (Interface `RankingRepository`)
 * **Princípio relacionado:** ISP (Interface Segregation Principle)
-* **Observação:** A interface de persistência de ranking fornece estritamente as operações necessárias para a aplicação: `carregar()`, `salvar()` e `resetar()`. Não há métodos desnecessários impostos às classes consumidoras ou implementadoras.
+* **Observação:** A interface de persistência de ranking fornece estritamente as operações necessárias para a aplicação: `salvar()`, `limpar()` e `listar()`. Não há métodos desnecessários impostos às classes consumidoras ou implementadoras.
 * **Impacto para manutenção, testes ou evolução:** Impede que o `JogoService` ou a classe `Main` fiquem acoplados a operações desnecessárias de banco de dados/arquivos.
 * **Proposta:** Se no futuro houver necessidade de buscas avançadas ou ordenações complexas no ranking, criar uma interface especializada (ex: `RankingSearchableRepository`) em vez de inflar a interface principal.
 * **Prioridade:** Média
