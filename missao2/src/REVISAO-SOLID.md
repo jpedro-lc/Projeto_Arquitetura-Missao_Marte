@@ -65,9 +65,9 @@ Este documento apresenta a análise crítica, a avaliação de decisões de proj
 
 ## 3. Decisão com a qual NÃO Concordamos (ou Implementaria de Outra Forma)
 
-* **Decisão:** Sugestão de divisão excessiva de pacotes/classes de leitura do Console na camada de apresentação (`presentation`) para uma aplicação de terminal simples.
-* **Justificativa:** Para um projeto de escopo enxuto (como um jogo de console simplificado), criar arquiteturas complexas com múltiplas interfaces e fábricas de leitura para o `Scanner` introduz complexidade acidental desnecessária. O uso do `Scanner` diretamente já funciona como uma abstração adequada fornecida pela linguagem para entradas de console.
-* **Abordagem alternativa:** Consolidar a entrada e saída do console em uma única classe utilitária coesa (`ConsoleUi` ou `TerminalView`) que gerencie o `Scanner` de maneira direta, evitando camadas de abstração prematuras que elevam a quantidade de arquivos sem retorno prático na manutenibilidade.
+* **Decisão:** A recomendação de manter o código modularizado ao extremo e focar estritamente na divisão progressiva de pacotes (como separar a apresentação e as entradas do console em múltiplos componentes antes de uma demanda real)..
+* **Justificativa:** Para um projeto de escopo enxuto — como um jogo de console simplificado em Java puro —, introduzir interfaces ou classes auxiliares unicamente para encapsular a leitura de comandos do `Scanner` adiciona complexidade acidental (boilerplate). Como o próprio tutorial pondera na seção de apresentação que “nesta versão, a classe concreta ainda é suficiente; não crie uma interface apenas por antecipação”, estendemos essa premissa para a camada de entrada/saída de terminal.
+* **Abordagem alternativa:** Consolidar a interação básica do usuário (`Scanner`) diretamente no ponto necessário ou em uma única classe utilitária de suporte ao terminal, evitando o fracionamento prematuro de classes de leitura que não trazem ganho real de testabilidade ou extensibilidade para um ambiente de linha de comando.
 
 ---
 
