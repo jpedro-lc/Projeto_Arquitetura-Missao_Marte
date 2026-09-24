@@ -73,12 +73,7 @@ Este documento apresenta a análise crítica, a avaliação de decisões de proj
 
 ## 4. Propostas de Melhorias Adicionais
 
-1. **Implementação de `RankingRepositoryMemory` para Testes Unitários:**
-   * **Descrição:** Disponibilizar uma implementação de repositório baseada em memória RAM, sem dependência do sistema de arquivos físico.
-   * **Impacto:** Permite a execução instantânea de testes automatizados, eliminando efeitos colaterais no disco.
-   * **Prioridade:** Média
-
-2. **Remoção de Código Duplicado na Verificação de Posições do Mapa:**
+1. **Remoção de Código Duplicado na Verificação de Posições do Mapa:**
    * **Descrição:** Encapsular a lógica de validação de posições e checagem de ocupação por entidades (nave, passageiros, asteroides, inimigos) dentro de métodos utilitários do domínio ou da classe `Missao`.
    * **Impacto:** Reduz a repetição de blocos de varredura (*loops*) em etapas de criação, renderização e movimentação.
    * **Prioridade:** Baixa
