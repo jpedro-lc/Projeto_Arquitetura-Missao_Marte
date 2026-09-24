@@ -63,15 +63,7 @@ Este documento apresenta a análise crítica, a avaliação de decisões de proj
 
 ---
 
-## 3. Decisão com a qual NÃO Concordamos (ou Implementaria de Outra Forma)
-
-* **Decisão:** A recomendação de manter o código modularizado ao extremo e focar estritamente na divisão progressiva de pacotes (como separar a apresentação e as entradas do console em múltiplos componentes antes de uma demanda real)..
-* **Justificativa:** Para um projeto de escopo enxuto — como um jogo de console simplificado em Java puro —, introduzir interfaces ou classes auxiliares unicamente para encapsular a leitura de comandos do `Scanner` adiciona complexidade acidental (boilerplate). Como o próprio tutorial pondera na seção de apresentação que “nesta versão, a classe concreta ainda é suficiente; não crie uma interface apenas por antecipação”, estendemos essa premissa para a camada de entrada/saída de terminal.
-* **Abordagem alternativa:** Consolidar a interação básica do usuário (`Scanner`) diretamente no ponto necessário ou em uma única classe utilitária de suporte ao terminal, evitando o fracionamento prematuro de classes de leitura que não trazem ganho real de testabilidade ou extensibilidade para um ambiente de linha de comando.
-
----
-
-## 4. Propostas de Melhorias Adicionais
+## 3. Propostas de Melhorias Adicionais
 
 1. **Remoção de Código Duplicado na Verificação de Posições do Mapa:**
    * **Descrição:** Encapsular a lógica de validação de posições e checagem de ocupação por entidades (nave, passageiros, asteroides, inimigos) dentro de métodos utilitários do domínio ou da classe `Missao`.
@@ -80,7 +72,7 @@ Este documento apresenta a análise crítica, a avaliação de decisões de proj
 
 ---
 
-## 5. Testes Realizados e Resultados
+## 4. Testes Realizados e Resultados
 
 A suíte de testes contemplou a verificação do comportamento funcional e a integridade de ponta a ponta do ciclo de vida do jogo:
 
@@ -96,7 +88,7 @@ A suíte de testes contemplou a verificação do comportamento funcional e a int
 
 ---
 
-## 6. Quadro Geral de Prioridades das Melhorias
+## 5. Quadro Geral de Prioridades das Melhorias
 
 | Melhoria / Observação | Local / Classe | Princípio Relacionado | Prioridade |
 | :--- | :--- | :--- | :--- |
