@@ -22,7 +22,7 @@ O padrão Singleton resolve esse problema garantindo que uma classe tenha apenas
 
 ## 2. Conceito
 
-### Explicação com palavras próprias
+### Explicação
 
 O Singleton é um padrão de projeto criacional utilizado quando precisamos garantir que determinada classe tenha somente um objeto instanciado durante a execução da aplicação.
 
