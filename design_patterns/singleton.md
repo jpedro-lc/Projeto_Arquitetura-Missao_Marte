@@ -111,7 +111,7 @@ Assim, diferentes clientes conseguem acessar o mesmo objeto.
 
 ---
 
-## 4. Exemplo prático em Java (OBRIGATÓRIO)
+## 4. Exemplo em Java
 
 ### Problema real
 
