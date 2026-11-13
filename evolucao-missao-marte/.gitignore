@@ -1,0 +1,8 @@
+# Artefatos locais das fases; fontes e configurações continuam versionáveis.
+out/
+bin/
+build/
+.gradle/
+*.class
+ranking.json
+ranking-solid-exercicio10.json

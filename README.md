@@ -1,5 +1,15 @@
 # 🚀 Missão Marte
 
+## Evolução arquitetural do projeto
+
+O planejamento e as novas versões estão organizados em
+[`evolucao-missao-marte/`](evolucao-missao-marte/README.md).
+As entregas `missao1/` e `missao2/` permanecem preservadas.
+A Fase 1 de refatoração está [concluída e validada](evolucao-missao-marte/fases/fase-01-refatoracao/README.md),
+com 162 verificações aprovadas. O [tutorial da fase](evolucao-missao-marte/fases/fase-01-refatoracao/docs/fase-01-tutorial.md)
+explica a separação entre regras do jogo e console. A Fase 2, de migração para Gradle,
+ainda não foi iniciada.
+
 **Repositório da Equipe:**  
 [https://github.com/jpedro-lc/Projeto_Arquitetura-Missao_Marte.git](https://github.com/jpedro-lc/Projeto_Arquitetura-Missao_Marte.git)
 
