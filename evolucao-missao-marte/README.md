@@ -1,7 +1,8 @@
 # Evolução arquitetural — Missão Marte
 
 Esta pasta reúne a evolução do jogo Java da equipe. A Fase 1 partiu da versão
-SOLID existente; as entregas anteriores continuam preservadas.
+SOLID existente e a Fase 2 migrou essa versão para Gradle. As entregas anteriores
+continuam preservadas.
 
 ## Onde estamos
 
@@ -9,6 +10,9 @@ SOLID existente; as entregas anteriores continuam preservadas.
 - **Fase 1:** aprovada pelo usuário, implementada e validada; veja o
   [projeto de console](fases/fase-01-refatoracao/README.md) e o
   [tutorial da refatoração](fases/fase-01-refatoracao/docs/fase-01-tutorial.md).
+- **Fase 2:** plano aprovado, implementada e validada com Gradle 8.7 e Java 17;
+  veja o [projeto Gradle](fases/fase-02-gradle/README.md) e o
+  [tutorial da migração](fases/fase-02-gradle/docs/fase-02-tutorial.md).
 - **Base dos fontes:** [`../missao2/src/solidexercicio10/`](../missao2/src/solidexercicio10/).
 - **Referência histórica:** [`../missao2/src/exercicio10/`](../missao2/src/exercicio10/).
 
@@ -21,6 +25,9 @@ Não é necessário copiar o repositório, mover as entregas ou criar outro work
 - [Plano da Fase 1](docs/plano-fase-01.md): diagnóstico e escopo aprovado.
   O documento foi preservado como registro da proposta anterior à implementação;
   o estado atual e os resultados estão neste índice e no README da fase.
+- [Plano da Fase 2](docs/plano-fase-02.md): proposta aprovada para migrar a Fase 1
+  para Gradle, preservada como registro do planejamento. A aprovação e os
+  resultados da implementação estão registrados neste índice e na nova fase.
 - [Referencial de API, Gradle e LibGDX](tutorial-api-gradle-libgdx.md): material
   somente leitura para as Fases 2, 3 e 4; não é a especificação da Fase 1.
 
@@ -33,15 +40,24 @@ evolucao-missao-marte/
 ├── PROMPT_MESTRE.md
 ├── tutorial-api-gradle-libgdx.md
 ├── docs/
-│   └── plano-fase-01.md
+│   ├── plano-fase-01.md
+│   └── plano-fase-02.md
 └── fases/
     ├── .gitkeep
-    └── fase-01-refatoracao/
+    ├── fase-01-refatoracao/
+    │   ├── README.md
+    │   ├── executar.sh
+    │   ├── src/solidexercicio10/
+    │   ├── tests/
+    │   └── docs/fase-01-tutorial.md
+    └── fase-02-gradle/
         ├── README.md
-        ├── executar.sh
-        ├── src/solidexercicio10/
-        ├── tests/
-        └── docs/fase-01-tutorial.md
+        ├── build.gradle / settings.gradle
+        ├── gradlew / gradlew.bat
+        ├── gradle/wrapper/
+        ├── src/main/java/solidexercicio10/
+        ├── src/test/java/solidexercicio10/tests/
+        └── docs/fase-02-tutorial.md
 ```
 
 Cada pasta de fase será criada somente depois da aprovação do respectivo plano.
@@ -55,7 +71,7 @@ fontes da `missao2` ou de outras fases.
 | Fase | Pasta prevista dentro de `fases/` | Situação |
 |---|---|---|
 | 1 — Refatoração arquitetural | `fase-01-refatoracao/` | Concluída: 162 verificações aprovadas |
-| 2 — Gradle | `fase-02-gradle/` | Não iniciada |
+| 2 — Gradle | `fase-02-gradle/` | Concluída: Gradle 8.7, Java 17 e 162 verificações via JUnit |
 | 3 — LibGDX | `fase-03-libgdx/` | Não iniciada |
 | 4 — Interface gráfica | `fase-04-interface-grafica/` | Não iniciada |
 | 5 — Servidor e ranking | `fase-05-servidor-ranking/` | Não iniciada |
@@ -63,7 +79,29 @@ fontes da `missao2` ou de outras fases.
 | 7 — Evolução livre | `fase-07-evolucao-livre/` | Não iniciada |
 
 Os comandos das fases seguintes serão registrados quando forem implementados e
-verificados. A Fase 2 ainda não foi iniciada.
+verificados. A Fase 3 ainda não foi iniciada.
+
+## Executar a Fase 2
+
+No Ubuntu amd64 deste ambiente, selecione JDK 17 e entre na pasta da fase:
+
+```bash
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+export PATH="$JAVA_HOME/bin:$PATH"
+cd evolucao-missao-marte/fases/fase-02-gradle
+./gradlew build
+./gradlew test --rerun-tasks
+./gradlew run --console=plain
+```
+
+Em outras máquinas, ajuste o caminho do JDK. O Wrapper seleciona Gradle 8.7;
+o Java que o inicia deve ser compatível. `build` compila, testa e empacota;
+`run` abre o jogo sem executar automaticamente a suíte.
+
+O relatório em `build/reports/tests/test/index.html` registra um teste JUnit
+que executa as 162 verificações preservadas. `installDist` e `distZip` geram
+distribuições com scripts de inicialização. Nenhuma biblioteca JUnit entra na
+distribuição de produção. A fase também foi validada numa cópia independente.
 
 ## Executar a Fase 1
 
@@ -98,11 +136,14 @@ automatizados existentes nessas bases. Relatos de testes nos documentos antigos
 não substituem testes executáveis ou uma nova validação.
 
 A Fase 1 permanece em Java de console, sem Gradle ou dependências externas.
-A seleção de versões para Gradle e LibGDX será feita no planejamento das fases
-correspondentes; as versões do tutorial não foram impostas ao ambiente.
+Na preparação da Fase 2 foram encontrados Gradle 8.7 e JDK 17 instalados. A Fase 2
+foi validada com essas versões, incluindo compilação `--release 17`. O registro
+acima descreve o ambiente anterior da preparação; a seleção de versões LibGDX
+permanece para a fase correspondente.
 
 ## Continuidade
 
-A autorização recebida foi para a Fase 1 e foi atendida. A migração para Gradle
-exige o planejamento e a aprovação específicos da Fase 2, conforme o prompt
-mestre. A versão concluída na Fase 1 será sua origem.
+As Fases 1 e 2 foram aprovadas e implementadas. A Fase 2 é preparada em branch
+própria para revisão por pull request, sem integração automática na `master`.
+A introdução de LibGDX exige planejamento e aprovação da Fase 3, conforme o
+prompt mestre, partindo da versão Gradle concluída.
