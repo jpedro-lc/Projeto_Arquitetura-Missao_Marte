@@ -1,8 +1,8 @@
 # Evolução arquitetural — Missão Marte
 
 Esta pasta reúne a evolução do jogo Java da equipe. A Fase 1 partiu da versão
-SOLID existente e a Fase 2 migrou essa versão para Gradle. As entregas anteriores
-continuam preservadas.
+SOLID existente, a Fase 2 migrou essa versão para Gradle e a Fase 3 introduziu
+LibGDX com os módulos core e lwjgl3. As entregas anteriores continuam preservadas.
 
 ## Onde estamos
 
@@ -13,6 +13,10 @@ continuam preservadas.
 - **Fase 2:** plano aprovado, implementada e validada com Gradle 8.7 e Java 17;
   veja o [projeto Gradle](fases/fase-02-gradle/README.md) e o
   [tutorial da migração](fases/fase-02-gradle/docs/fase-02-tutorial.md).
+- **Fase 3:** aprovada conforme o referencial, implementada com LibGDX 1.12.1,
+  core/lwjgl3 e sprites existentes; testes e janela gráfica validados. Veja o
+  [projeto LibGDX](fases/fase-03-libgdx/README.md) e o
+  [tutorial do framework](fases/fase-03-libgdx/docs/fase-03-tutorial.md).
 - **Base dos fontes:** [`../missao2/src/solidexercicio10/`](../missao2/src/solidexercicio10/).
 - **Referência histórica:** [`../missao2/src/exercicio10/`](../missao2/src/exercicio10/).
 
@@ -28,6 +32,8 @@ Não é necessário copiar o repositório, mover as entregas ou criar outro work
 - [Plano da Fase 2](docs/plano-fase-02.md): proposta aprovada para migrar a Fase 1
   para Gradle, preservada como registro do planejamento. A aprovação e os
   resultados da implementação estão registrados neste índice e na nova fase.
+- [Plano da Fase 3](docs/plano-fase-03.md): organização aprovada conforme o
+  referencial, com separação entre regras e apresentação dentro do core.
 - [Referencial de API, Gradle e LibGDX](tutorial-api-gradle-libgdx.md): material
   somente leitura para as Fases 2, 3 e 4; não é a especificação da Fase 1.
 
@@ -41,7 +47,8 @@ evolucao-missao-marte/
 ├── tutorial-api-gradle-libgdx.md
 ├── docs/
 │   ├── plano-fase-01.md
-│   └── plano-fase-02.md
+│   ├── plano-fase-02.md
+│   └── plano-fase-03.md
 └── fases/
     ├── .gitkeep
     ├── fase-01-refatoracao/
@@ -50,14 +57,22 @@ evolucao-missao-marte/
     │   ├── src/solidexercicio10/
     │   ├── tests/
     │   └── docs/fase-01-tutorial.md
-    └── fase-02-gradle/
+    ├── fase-02-gradle/
+    │   ├── README.md
+    │   ├── build.gradle / settings.gradle
+    │   ├── gradlew / gradlew.bat
+    │   ├── gradle/wrapper/
+    │   ├── src/main/java/solidexercicio10/
+    │   ├── src/test/java/solidexercicio10/tests/
+    │   └── docs/fase-02-tutorial.md
+    └── fase-03-libgdx/
         ├── README.md
         ├── build.gradle / settings.gradle
-        ├── gradlew / gradlew.bat
-        ├── gradle/wrapper/
-        ├── src/main/java/solidexercicio10/
-        ├── src/test/java/solidexercicio10/tests/
-        └── docs/fase-02-tutorial.md
+        ├── gradlew / gradlew.bat / gradle/wrapper/
+        ├── core/src/main/java/br/unifor/missaomarte/
+        ├── core/assets/images/
+        ├── lwjgl3/src/main/java/br/unifor/missaomarte/lwjgl3/
+        └── docs/fase-03-tutorial.md
 ```
 
 Cada pasta de fase será criada somente depois da aprovação do respectivo plano.
@@ -72,14 +87,35 @@ fontes da `missao2` ou de outras fases.
 |---|---|---|
 | 1 — Refatoração arquitetural | `fase-01-refatoracao/` | Concluída: 162 verificações aprovadas |
 | 2 — Gradle | `fase-02-gradle/` | Concluída: Gradle 8.7, Java 17 e 162 verificações via JUnit |
-| 3 — LibGDX | `fase-03-libgdx/` | Não iniciada |
+| 3 — LibGDX | `fase-03-libgdx/` | Concluída: dois módulos, sprites, 15 casos JUnit e janela validados |
 | 4 — Interface gráfica | `fase-04-interface-grafica/` | Não iniciada |
 | 5 — Servidor e ranking | `fase-05-servidor-ranking/` | Não iniciada |
 | 6 — Android | `fase-06-android/` | Não iniciada |
 | 7 — Evolução livre | `fase-07-evolucao-livre/` | Não iniciada |
 
 Os comandos das fases seguintes serão registrados quando forem implementados e
-verificados. A Fase 3 ainda não foi iniciada.
+verificados. A próxima etapa é a Fase 4, que exige seu próprio plano e aprovação.
+
+## Executar a Fase 3
+
+Com JDK 17, entre em `fases/fase-03-libgdx/` e execute:
+
+```bash
+./gradlew build
+./gradlew :lwjgl3:run
+```
+
+`core` contém regras e telas compartilhadas; `lwjgl3` contém a inicialização e os
+adaptadores desktop. A organização segue o referencial com LibGDX 1.12.1.
+As entidades/serviços permanecem sem imports gráficos. O jogo continua por turnos
+e usa nave, inimigo, asteroide e fundo copiados dos assets fornecidos.
+
+O console está disponível com `./gradlew :lwjgl3:runConsole --console=plain`.
+`./gradlew :lwjgl3:smokeDesktop` executa a verificação gráfica com janela real e
+entrada determinística; `./gradlew :lwjgl3:installDist` gera a distribuição.
+Os 15 casos JUnit incluem um adaptador das 162 verificações herdadas, além dos
+testes novos de coordenação e entrada. Consulte os controles e limites no
+[README da Fase 3](fases/fase-03-libgdx/README.md).
 
 ## Executar a Fase 2
 
