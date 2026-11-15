@@ -1,0 +1,8 @@
+plugins {
+    id 'java-library'
+}
+
+dependencies {
+    // MissaoMarteGame estende Game e a API pública da apresentação usa LibGDX.
+    api "com.badlogicgames.gdx:gdx:$gdxVersion"
+}

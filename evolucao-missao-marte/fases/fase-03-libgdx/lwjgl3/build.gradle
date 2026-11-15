@@ -1,0 +1,51 @@
+plugins {
+    id 'application'
+}
+
+dependencies {
+    implementation project(':core')
+    implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+    runtimeOnly "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+}
+
+application {
+    mainClass = 'br.unifor.missaomarte.lwjgl3.Lwjgl3Launcher'
+    // GLFW precisa iniciar na primeira thread no macOS.
+    if (System.getProperty('os.name').toLowerCase(java.util.Locale.ROOT).contains('mac')) {
+        applicationDefaultJvmArgs = ['-XstartOnFirstThread']
+    }
+}
+
+sourceSets.main.resources.srcDir rootProject.file('core/assets')
+
+tasks.named('run', JavaExec) {
+    workingDir = rootProject.projectDir
+}
+
+tasks.register('runConsole', JavaExec) {
+    group = 'application'
+    description = 'Executa a interface de console preservada.'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'br.unifor.missaomarte.lwjgl3.console.MainConsole'
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+    standardInput = System.in
+    workingDir = rootProject.projectDir
+}
+
+// Verificação gráfica explícita: build/test comuns continuam sem exigir display.
+tasks.register('smokeDesktop', JavaExec) {
+    group = 'verification'
+    description = 'Abre uma janela real e verifica render, resize e descarte.'
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'br.unifor.missaomarte.lwjgl3.VerificacaoDesktop'
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+    jvmArgs application.applicationDefaultJvmArgs
+    workingDir = rootProject.projectDir
+    args providers.gradleProperty('smokeOutput')
+            .getOrElse(layout.buildDirectory.dir('reports/smoke').get().asFile.absolutePath)
+}
