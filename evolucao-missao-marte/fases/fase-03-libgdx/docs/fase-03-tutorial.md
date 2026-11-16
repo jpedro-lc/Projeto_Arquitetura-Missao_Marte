@@ -1,5 +1,10 @@
 # Fase 3 — Do console ao ciclo de vida LibGDX
 
+> Registro da introdução inicial ao framework. A interface atual recebeu menu,
+> HUD, pausa e áudio por solicitação de 16/11/2026. Consulte a
+> [reformulação visual](reformulacao-interface.md) e o [README atual](../README.md)
+> para controles, assets, comportamento de ESC e validação atualizados.
+
 ## 1. Introdução
 
 A Fase 2 já separava regras e terminal. Agora introduzimos uma janela LibGDX
