@@ -11,6 +11,7 @@ turnos e utiliza as imagens fornecidas pelo usuário.
 - `core/assets/images/`: nave, inimigo, asteroide e fundo.
 - `lwjgl3/`: launcher desktop, teclado, persistência em arquivo e console legado.
 - [Tutorial da fase](docs/fase-03-tutorial.md): transformação, conceitos e exercícios.
+- [Correções posteriores](docs/correcoes-fase-03.md): limites dos inimigos e encerramento imediato.
 - [Plano aprovado](../../docs/plano-fase-03.md): escopo e critérios de validação.
 - [Referencial](../../tutorial-api-gradle-libgdx.md): somente leitura.
 
@@ -99,19 +100,30 @@ não são utilizados como HUD funcional ou como atlas nativo.
 
 Em 15/11/2026, com JDK 17:
 
-- `clean build`: 15 casos JUnit aprovados, sendo 5 de coordenação, 9 de entrada
-  e 1 adaptador que executa as **162 verificações herdadas**; sem falhas ou erros.
+- `clean build`: 32 casos JUnit aprovados, sendo 5 de coordenação, 17 de regressão,
+  9 de entrada e 1 adaptador que executa **162 verificações herdadas**, ajustadas
+  às correções de limites/aborto; sem falhas ou erros.
 - `installDist`: distribuição gerada com as quatro imagens dentro do JAR.
 - `smokeDesktop`: janela/OpenGL reais, 210 frames, três capturas inspecionadas,
   vitória e gravação única, duas mudanças de resolução e descarte sem erro OpenGL.
+  Após as correções, também verifica inimigos dentro do mapa e comandos de
+  movimento ignorados após vitória e aborto.
 - Cópia independente em `/tmp`, com espaços no caminho: build offline e testes
   aprovados; apenas core e lwjgl3 listados como subprojetos.
 - Distribuição copiada para fora do projeto: verificação gráfica aprovada usando
   os JARs empacotados em um diretório sem assets locais.
 - `runConsole`: menu aberto e encerrado pela opção 4 usando a entrada padrão.
-- Regras/serviços/contratos comparados à Fase 2: mudança apenas de namespace.
+- Na entrega inicial, regras/serviços/contratos diferiam da Fase 2 apenas pelo
+  namespace. As correções posteriores alteram os limites dos inimigos e fazem
+  o aborto interromper o turno imediatamente.
 - Fases anteriores e assets originais conferidos por hash, sem alterações.
 
-Os testes e a adaptação preservam também as limitações herdadas: geração em mapas
-pequenos, inimigos sem limites e particularidades do ranking em arquivo. A Fase 3
-não corrige essas regras nem converte o jogo em movimento contínuo.
+As correções mantêm os inimigos em `[-limite, limite]` em ambos os eixos. Ao
+abortar, não há novo movimento de inimigos nem colisão. Depois de vitória,
+derrota ou aborto, comandos não alteram movimentos, pontos, posições ou tempo.
+O movimento que causa o encerramento ainda conta uma vez; comandos seguintes
+são ignorados. Tentativas de mover a nave contra a borda continuam consumindo
+ponto e contando movimento, como na regra anterior.
+
+Permanecem as limitações herdadas de geração em mapas pequenos e do ranking em
+arquivo. O jogo continua por turnos.
