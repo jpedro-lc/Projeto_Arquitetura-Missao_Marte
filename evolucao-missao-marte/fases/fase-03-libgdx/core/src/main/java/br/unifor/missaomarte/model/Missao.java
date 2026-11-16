@@ -48,11 +48,11 @@ public class Missao {
         return true;
     }
 
-    public void moverInimigos(Random random) {
+    public void moverInimigos(Random random, int limite) {
         for (Inimigo inimigo : inimigos) {
             int dx = random.nextInt(3) - 1;
             int dy = random.nextInt(3) - 1;
-            inimigo.mover(dx, dy);
+            inimigo.moverComLimites(dx, dy, -limite, limite, -limite, limite);
         }
     }
 

@@ -180,7 +180,8 @@ ControladorPartida inicia os padrões existentes e encaminha ações ao serviço
 Sem ação, apenas consulta o estado, permitindo atualizar o relógio sem avançar
 inimigos, pontos ou movimentos. Após o encerramento, R inicia uma nova missão;
 durante a partida, não a reinicia. Esc solicita fechamento sem executar ABORTAR.
-Q executa a ação de aborto com a mesma ordem de turno da fase anterior.
+Q executa o aborto e encerra imediatamente. Essa correção posterior à migração
+evita que o mesmo comando ainda mova inimigos ou produza colisões depois do fim.
 
 ### 6.5. Integrar os assets e desenhar
 
@@ -252,8 +253,10 @@ Na coordenação, renderizar não equivale a executar uma ação:
 }
 ```
 
-JogoService mantém os mesmos métodos, ordem do turno e regras. Sua alteração
-nesta fase é o prefixo de pacote, não a substituição por código do exemplo.
+Na migração inicial, JogoService manteve métodos, ordem do turno e regras,
+mudando apenas o prefixo de pacote. As [correções posteriores](correcoes-fase-03.md)
+passam o limite da partida ao movimento dos inimigos e interrompem o turno no
+aborto. Não substituem o serviço pelo código simplificado do referencial.
 
 ## 8. Explicação das alterações
 
@@ -333,12 +336,15 @@ gráfico com Esc e saia do console pela opção 4 antes de executar o próximo.
 
 Build/test não exigem display. Relatórios JUnit ficam em
 `core/build/reports/tests/test/` e `lwjgl3/build/reports/tests/test/`.
-São **15 casos JUnit**: 5 de coordenação, 9 de teclado e 1 adaptador da suíte
-com **162 verificações herdadas**. Esses números não representam 177 casos JUnit.
+São **32 casos JUnit**: 5 de coordenação, 17 de regressão, 9 de teclado e 1
+adaptador da suíte com **162 verificações herdadas**, ajustadas às correções.
+As 162 checagens internas não são casos JUnit adicionais.
 
 O smoke gráfico exige display/OpenGL e usa entrada determinística injetada,
 sem enviar teclas ao computador. Verifica as quatro imagens, frames sem turnos,
 movimento, embarque, vitória, gravação única, reinício, aborto e fechamento.
+Também verifica limites de inimigos e ausência de novos movimentos depois da
+vitória ou aborto, inclusive quando recebe outro comando de movimento.
 Redimensiona a janela duas vezes e gera três PNGs em
 `lwjgl3/build/reports/smoke/`. A inspeção confirmou imagens, textos e proporções.
 Não equivale a teste físico de teclado nem à validação de Android.
@@ -375,7 +381,9 @@ sem substituir as regras existentes. A tela usa os assets fornecidos, preserva
 turnos e mantém o console como alternativa. Os testes herdados continuam válidos
 e a coordenação gráfica recebe testes próprios.
 
-Permanecem as limitações anteriores de geração em mapas pequenos, inimigos fora
-dos limites e ranking em arquivo. Elas não foram causadas pela migração gráfica.
+As correções autorizadas após a entrega mantêm os inimigos dentro dos limites e
+interrompem imediatamente o turno ao abortar. Novos comandos após encerramento
+não alteram a partida. Permanecem as limitações anteriores de geração em mapas
+pequenos e ranking em arquivo. Elas não foram causadas pela migração gráfica.
 Menus completos, animações, áudio e HUD elaborado pertencem à Fase 4; login,
 ranking global e Android permanecem nas suas fases específicas.

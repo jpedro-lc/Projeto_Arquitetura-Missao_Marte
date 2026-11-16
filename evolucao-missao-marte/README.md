@@ -87,7 +87,7 @@ fontes da `missao2` ou de outras fases.
 |---|---|---|
 | 1 — Refatoração arquitetural | `fase-01-refatoracao/` | Concluída: 162 verificações aprovadas |
 | 2 — Gradle | `fase-02-gradle/` | Concluída: Gradle 8.7, Java 17 e 162 verificações via JUnit |
-| 3 — LibGDX | `fase-03-libgdx/` | Concluída: dois módulos, sprites, 15 casos JUnit e janela validados |
+| 3 — LibGDX | `fase-03-libgdx/` | Concluída: dois módulos, sprites, 32 casos JUnit e janela validados; limites/aborto corrigidos |
 | 4 — Interface gráfica | `fase-04-interface-grafica/` | Não iniciada |
 | 5 — Servidor e ranking | `fase-05-servidor-ranking/` | Não iniciada |
 | 6 — Android | `fase-06-android/` | Não iniciada |
@@ -113,8 +113,9 @@ e usa nave, inimigo, asteroide e fundo copiados dos assets fornecidos.
 O console está disponível com `./gradlew :lwjgl3:runConsole --console=plain`.
 `./gradlew :lwjgl3:smokeDesktop` executa a verificação gráfica com janela real e
 entrada determinística; `./gradlew :lwjgl3:installDist` gera a distribuição.
-Os 15 casos JUnit incluem um adaptador das 162 verificações herdadas, além dos
-testes novos de coordenação e entrada. Consulte os controles e limites no
+Os 32 casos JUnit incluem um adaptador das 162 verificações herdadas ajustadas,
+além dos testes de coordenação, entrada e regressão. As correções posteriores
+limitam inimigos ao mapa e interrompem o turno ao abortar. Consulte os controles e limites no
 [README da Fase 3](fases/fase-03-libgdx/README.md).
 
 ## Executar a Fase 2

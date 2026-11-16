@@ -76,12 +76,13 @@ public class JogoService {
         } else if (acao == Acao.ABORTAR) {
             encerrar(Situacao.ABORTADA);
             eventos.add(new Evento(TipoEvento.ABORTOU, "", 0));
+            return new ResultadoAcao(consultarEstado(), eventos);
         } else {
             eventos.add(new Evento(TipoEvento.COMANDO_INVALIDO, "", 0));
         }
 
-        // A ordem do turno é a mesma da base, inclusive após aborto e comando inválido.
-        missao.moverInimigos(randomInimigos);
+        // O aborto já retornou; somente o turno em andamento continua.
+        missao.moverInimigos(randomInimigos, limite);
         if (missao.verificaColisao()) {
             nave.perderVida();
             if (nave.getVidas() > 0) {

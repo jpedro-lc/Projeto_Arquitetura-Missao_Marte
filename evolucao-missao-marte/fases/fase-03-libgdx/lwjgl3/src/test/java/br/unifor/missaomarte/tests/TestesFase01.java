@@ -35,7 +35,7 @@ public class TestesFase01 {
         testarFabrica();
         testarRankingArquivo();
         testarConsole();
-        System.out.println("PASSOU: " + verificacoes + " verificações da Fase 1.");
+        System.out.println("PASSOU: " + verificacoes + " verificações herdadas, com correções de limites e aborto.");
     }
 
     private static void testarInicioEMovimento() {
@@ -137,9 +137,9 @@ public class TestesFase01 {
         });
         c.jogo.iniciar("A", Dificuldade.FACIL, 5);
         var r = c.jogo.executar(Acao.ABORTAR);
-        evento(r, TipoEvento.ABORTOU, "aborto informado antes de colisão");
-        evento(r, TipoEvento.NAVE_DESTRUIDA, "aborto ainda verifica colisão fatal");
-        ok(r.estado().situacao() == Situacao.DERROTA && c.ranking.dados.isEmpty(), "colisão precede vitória na base");
+        evento(r, TipoEvento.ABORTOU, "aborto encerra imediatamente");
+        ok(r.eventos().size() == 1 && r.estado().nave().vidas() == 1, "aborto não verifica colisão fatal");
+        ok(r.estado().situacao() == Situacao.ABORTADA && c.ranking.dados.isEmpty(), "aborto não vira derrota ou vitória");
     }
 
     private static void testarCombustivel() {
@@ -168,14 +168,14 @@ public class TestesFase01 {
         evento(c.jogo.executar(Acao.INVALIDA), TipoEvento.COMANDO_INVALIDO, "inválido gera evento");
         ok(c.random.chamadas == 2 && c.jogo.consultarEstado().pontos() == 20, "inválido move inimigos sem custo");
         var r = c.jogo.executar(Acao.ABORTAR);
-        ok(c.random.chamadas == 4 && r.estado().situacao() == Situacao.ABORTADA, "aborto ainda move inimigos");
+        ok(c.random.chamadas == 2 && r.estado().situacao() == Situacao.ABORTADA, "aborto não move inimigos");
         ok(c.ranking.dados.isEmpty(), "aborto não salva");
         c.jogo.executar(Acao.CIMA);
-        ok(c.random.chamadas == 4, "não há turnos após encerrar");
+        ok(c.random.chamadas == 2, "não há turnos após encerrar");
         var m = new Missao(new Nave("T", 0, 0));
         m.adicionarInimigo(new Inimigo(5, 5));
-        m.moverInimigos(new RandomFixo(2));
-        ok(m.getInimigos().get(0).getX() == 6 && m.getInimigos().get(0).getY() == 6, "movimento de inimigos mantém ausência de limite");
+        m.moverInimigos(new RandomFixo(2), 5);
+        ok(m.getInimigos().get(0).getX() == 5 && m.getInimigos().get(0).getY() == 5, "inimigos permanecem dentro do limite");
     }
 
     private static void testarImutabilidadeEReinicio() {

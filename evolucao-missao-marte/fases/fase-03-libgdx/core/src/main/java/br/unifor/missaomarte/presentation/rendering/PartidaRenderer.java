@@ -83,7 +83,7 @@ public final class PartidaRenderer {
     }
 
     private void sprite(String caminho, int x, int y, int limite, float celula) {
-        // O legado permite inimigos fora do mapa; não corrigir suas posições aqui.
+        // Guarda de desenho; limites e coordenadas são responsabilidade do domínio.
         if (Math.abs(x) > limite || Math.abs(y) > limite) return;
         Texture imagem = recursos.textura(caminho);
         float escala = celula * 0.83f / Math.max(imagem.getWidth(), imagem.getHeight());

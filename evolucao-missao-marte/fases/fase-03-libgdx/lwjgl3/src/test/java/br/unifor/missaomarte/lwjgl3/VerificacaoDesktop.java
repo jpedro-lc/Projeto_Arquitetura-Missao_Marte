@@ -36,7 +36,7 @@ public final class VerificacaoDesktop {
                 var missao = new Missao(new Nave("Teste", 0, 0, 5));
                 missao.adicionarPassageiro(new Professor("Ada", 1, 0));
                 missao.adicionarAsteroide(new Asteroide(-3, -2));
-                missao.adicionarInimigo(new Inimigo(4, 4));
+                missao.adicionarInimigo(new Inimigo(5, 5));
                 return missao;
             }
         };
@@ -45,6 +45,7 @@ public final class VerificacaoDesktop {
             case 45 -> Keys.D;
             case 80 -> Keys.C;
             case 105 -> Keys.A;
+            case 125, 170 -> Keys.D;
             case 135, 185 -> Keys.R;
             case 160 -> Keys.Q;
             case 210 -> Keys.ESCAPE;
@@ -53,6 +54,9 @@ public final class VerificacaoDesktop {
         var game = new MissaoMarteGame(jogo, teclado);
         var listener = new ApplicationAdapter() {
             private EstadoPartida inicial;
+            private EstadoPartida vitoria;
+            private EstadoPartida antesAborto;
+            private EstadoPartida abortada;
             private boolean descartado;
 
             @Override
@@ -67,6 +71,8 @@ public final class VerificacaoDesktop {
                     int f = quadro.incrementAndGet();
                     game.render();
                     var estado = jogo.consultarEstado();
+                    exigir(estado.inimigos().stream().allMatch(i -> Math.abs(i.x()) <= estado.limite()
+                            && Math.abs(i.y()) <= estado.limite()), "Inimigo saiu do mapa");
                     if (f == 30) {
                         exigir(estado.movimentos() == 0 && estado.pontos() == 20, "Frame virou turno");
                         exigir(estado.inimigos().equals(inicial.inimigos()), "Inimigo moveu sem entrada");
@@ -79,14 +85,24 @@ public final class VerificacaoDesktop {
                     if (f == 105) {
                         exigir(estado.situacao() == Situacao.VITORIA && estado.pontos() == 33, "Regra de vitória alterada");
                         exigir(ranking.gravacoes == 1, "Ranking não foi salvo uma única vez");
+                        vitoria = estado;
                     }
                     if (f == 120) {
                         exigir(ranking.gravacoes == 1, "Render repetiu gravação do ranking");
                         capturar(saida.resolve("03-vitoria.png"));
                     }
+                    if (f == 128) exigir(estado.equals(vitoria), "Comando depois da vitória alterou a partida");
                     if (f == 136 || f == 186) exigir(estado.situacao() == Situacao.EM_ANDAMENTO
                             && estado.pontos() == 20 && estado.movimentos() == 0, "Reinício incorreto");
-                    if (f == 161) exigir(estado.situacao() == Situacao.ABORTADA, "Aborto incorreto");
+                    if (f == 159) antesAborto = estado;
+                    if (f == 161) {
+                        exigir(estado.situacao() == Situacao.ABORTADA, "Aborto incorreto");
+                        exigir(estado.nave().equals(antesAborto.nave()) && estado.inimigos().equals(antesAborto.inimigos())
+                                && estado.movimentos() == antesAborto.movimentos() && estado.pontos() == antesAborto.pontos(),
+                                "Aborto ainda processou o turno");
+                        abortada = estado;
+                    }
+                    if (f == 175) exigir(estado.equals(abortada), "Comando depois do aborto alterou a partida");
                     if (f >= 220) throw new AssertionError("Esc não encerrou a aplicação");
                 } catch (Throwable erro) {
                     falha.set(erro);
@@ -106,7 +122,7 @@ public final class VerificacaoDesktop {
                     exigir(quadro.get() >= 210, "Janela fechada antes de concluir o cenário");
                     exigir(ranking.gravacoes == 1, "Gravação inesperada no ranking");
                     exigir(Gdx.gl.glGetError() == 0, "Erro OpenGL ao renderizar/descartar");
-                    System.out.println("SMOKE DESKTOP PASSOU: texturas, frames, ações, vitória, resize, reinício e dispose; quadros="
+                    System.out.println("SMOKE DESKTOP PASSOU: texturas, limites, fim sem novos movimentos, vitória, resize, reinício e dispose; quadros="
                             + quadro.get() + "; capturas=" + saida);
                 } catch (Throwable erro) {
                     falha.compareAndSet(null, erro);
