@@ -5,4 +5,5 @@ plugins {
 dependencies {
     // MissaoMarteGame estende Game e a API pública da apresentação usa LibGDX.
     api "com.badlogicgames.gdx:gdx:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
 }

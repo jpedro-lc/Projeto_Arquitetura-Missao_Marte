@@ -4,4 +4,6 @@ package br.unifor.missaomarte.presentation.input;
 @FunctionalInterface
 public interface EntradaJogo {
     ComandoEntrada ler();
+
+    default boolean pausaSolicitada() { return false; }
 }
