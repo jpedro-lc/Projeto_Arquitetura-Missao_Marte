@@ -19,6 +19,9 @@ LibGDX com os módulos core e lwjgl3. As entregas anteriores continuam preservad
   [tutorial do framework](fases/fase-03-libgdx/docs/fase-03-tutorial.md).
   A [reformulação visual de 16/11/2026](fases/fase-03-libgdx/docs/reformulacao-interface.md)
   foi solicitada como evolução da própria Fase 3, mantendo as regras existentes.
+- **Fase 4:** plano aprovado em 17/11/2026 (opção A: JDK 17), implementada e validada;
+  veja o [projeto da interface gráfica](fases/fase-04-interface-grafica/README.md) e o
+  [tutorial](fases/fase-04-interface-grafica/docs/fase-04-tutorial.md).
 - **Base dos fontes:** [`../missao2/src/solidexercicio10/`](../missao2/src/solidexercicio10/).
 - **Referência histórica:** [`../missao2/src/exercicio10/`](../missao2/src/exercicio10/).
 
@@ -36,6 +39,8 @@ Não é necessário copiar o repositório, mover as entregas ou criar outro work
   resultados da implementação estão registrados neste índice e na nova fase.
 - [Plano da Fase 3](docs/plano-fase-03.md): organização aprovada conforme o
   referencial, com separação entre regras e apresentação dentro do core.
+- [Plano da Fase 4](docs/plano-fase-04.md): interface gráfica com SpaceRage,
+  movimento visual e animações, sem alterar regras.
 - [Referencial de API, Gradle e LibGDX](tutorial-api-gradle-libgdx.md): material
   somente leitura para as Fases 2, 3 e 4; não é a especificação da Fase 1.
 
@@ -50,7 +55,8 @@ evolucao-missao-marte/
 ├── docs/
 │   ├── plano-fase-01.md
 │   ├── plano-fase-02.md
-│   └── plano-fase-03.md
+│   ├── plano-fase-03.md
+│   └── plano-fase-04.md
 └── fases/
     ├── .gitkeep
     ├── fase-01-refatoracao/
@@ -67,14 +73,17 @@ evolucao-missao-marte/
     │   ├── src/main/java/solidexercicio10/
     │   ├── src/test/java/solidexercicio10/tests/
     │   └── docs/fase-02-tutorial.md
-    └── fase-03-libgdx/
+    ├── fase-03-libgdx/
+    │   ├── README.md
+    │   ├── build.gradle / settings.gradle
+    │   ├── gradlew / gradlew.bat / gradle/wrapper/
+    │   ├── core/src/main/java/br/unifor/missaomarte/
+    │   ├── core/assets/            # sprites, sons, fontes, licenças e referências
+    │   ├── lwjgl3/src/main/java/br/unifor/missaomarte/lwjgl3/
+    │   └── docs/fase-03-tutorial.md
+    └── fase-04-interface-grafica/  # mesma estrutura; apresentação animada
         ├── README.md
-        ├── build.gradle / settings.gradle
-        ├── gradlew / gradlew.bat / gradle/wrapper/
-        ├── core/src/main/java/br/unifor/missaomarte/
-        ├── core/assets/            # sprites, sons, fontes, licenças e referências
-        ├── lwjgl3/src/main/java/br/unifor/missaomarte/lwjgl3/
-        └── docs/fase-03-tutorial.md
+        └── docs/fase-04-tutorial.md
 ```
 
 Cada pasta de fase será criada somente depois da aprovação do respectivo plano.
@@ -90,13 +99,26 @@ fontes da `missao2` ou de outras fases.
 | 1 — Refatoração arquitetural | `fase-01-refatoracao/` | Concluída: 162 verificações aprovadas |
 | 2 — Gradle | `fase-02-gradle/` | Concluída: Gradle 8.7, Java 17 e 162 verificações via JUnit |
 | 3 — LibGDX | `fase-03-libgdx/` | Concluída: HUD, menu, pausa, áudio e sprites; 44 casos JUnit e janela validados |
-| 4 — Interface gráfica | `fase-04-interface-grafica/` | Não iniciada |
+| 4 — Interface gráfica | `fase-04-interface-grafica/` | Concluída: animações, movimento visual, HUD SpaceRage; 47 casos JUnit e smoke em 3 resoluções |
 | 5 — Servidor e ranking | `fase-05-servidor-ranking/` | Não iniciada |
 | 6 — Android | `fase-06-android/` | Não iniciada |
 | 7 — Evolução livre | `fase-07-evolucao-livre/` | Não iniciada |
 
 Os comandos das fases seguintes serão registrados quando forem implementados e
-verificados. A próxima etapa é a Fase 4, que exige seu próprio plano e aprovação.
+verificados. A próxima etapa é a Fase 5, que exige seu próprio plano e aprovação.
+
+## Executar a Fase 4
+
+Com JDK 17, entre em `fases/fase-04-interface-grafica/` e execute:
+
+```bash
+./gradlew build
+./gradlew :lwjgl3:run
+./gradlew :lwjgl3:smokeDesktop
+```
+
+Mesma arquitetura da Fase 3; só `core/presentation` e `core/screen` mudaram.
+Detalhes e controles no [README da Fase 4](fases/fase-04-interface-grafica/README.md).
 
 ## Executar a Fase 3
 
