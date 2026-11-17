@@ -1,0 +1,6 @@
+.gradle/
+build/
+out/
+*.class
+/ranking-solid-exercicio10.json
+!gradle/wrapper/gradle-wrapper.jar
