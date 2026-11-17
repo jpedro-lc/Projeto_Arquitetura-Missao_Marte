@@ -51,7 +51,7 @@ Nenhum arquivo de `model`, `service` ou `repository` foi alterado.
 Resultado em 17/11/2026 (Windows 11, OpenJDK 17.0.2):
 
 - **48 casos JUnit** aprovados: os 44 da Fase 3 (incluindo as **162 verificações
-  herdadas**) 3 novos em `AnimacaoVisualTest` (interpolação, corte de animação,
+  herdadas**), 3 novos em `AnimacaoVisualTest` (interpolação, corte de animação,
   estados da base sem alterar a vitória) e 1 em `PartidaRendererTest` (passageiro em coordenadas negativas).
 - **Smoke gráfico** aprovado com janela real: menu, instruções, HUD, pausa,
   áudio, colisão, vitória, derrota, reinício, redimensionamento e descarte;
