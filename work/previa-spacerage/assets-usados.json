@@ -1,0 +1,18 @@
+{
+  "bg": "sprites/spacerage_original/BG.png",
+  "top": "sprites/ui_spacerage/hud/hud_top_background.png",
+  "lower": "sprites/ui_spacerage/hud/hud_lower_background.png",
+  "footer": "sprites/ui_spacerage/footer/footer_background.png",
+  "idle": "sprites/ui_spacerage/base/base_idle.png",
+  "active": "sprites/ui_spacerage/base/base_active.png",
+  "landing": "sprites/ui_spacerage/base/base_landing_01.png",
+  "complete": "sprites/ui_spacerage/base/base_complete.png",
+  "ship": "sprites/spacerage_original/Player/player_b_m.png",
+  "enemy": "sprites/spacerage_original/Enemies/enemy_1_r_m.png",
+  "asteroid": "sprites/ui_spacerage/asteroids/asteroid_large_01.png",
+  "astronaut": "sprites/ui_spacerage/astronauts/astronaut_idle_01.png",
+  "menu": "sprites/ui_spacerage/menus/menu_panel.png",
+  "pause": "sprites/ui_spacerage/pause/pause_panel.png",
+  "button": "sprites/ui_spacerage/menus/menu_button_normal.png",
+  "font": "fonts/Audiowide-Regular.ttf"
+}

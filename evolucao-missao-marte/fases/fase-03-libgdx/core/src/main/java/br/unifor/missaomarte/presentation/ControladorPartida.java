@@ -1,12 +1,14 @@
 package br.unifor.missaomarte.presentation;
 
 import java.util.List;
+import java.util.ArrayDeque;
 import java.util.Objects;
 import br.unifor.missaomarte.model.Acao;
 import br.unifor.missaomarte.model.Dificuldade;
 import br.unifor.missaomarte.model.EstadoPartida;
 import br.unifor.missaomarte.model.EstadoPartida.Situacao;
 import br.unifor.missaomarte.model.ResultadoAcao.Evento;
+import br.unifor.missaomarte.model.ResultadoAcao;
 import br.unifor.missaomarte.presentation.input.EntradaJogo;
 import br.unifor.missaomarte.service.JogoService;
 
@@ -17,11 +19,17 @@ public final class ControladorPartida {
     private EstadoPartida estado;
     private List<Evento> eventos = List.of();
     private boolean pausado;
+    private final ArrayDeque<ResultadoAcao> novosResultados = new ArrayDeque<>();
+    private int geracao = 1;
 
     public ControladorPartida(JogoService jogo, EntradaJogo entrada) {
+        this(jogo, entrada, null, Dificuldade.MEDIO, 5);
+    }
+
+    public ControladorPartida(JogoService jogo, EntradaJogo entrada, String piloto, Dificuldade dificuldade, int limite) {
         this.jogo = Objects.requireNonNull(jogo);
         this.entrada = Objects.requireNonNull(entrada);
-        estado = jogo.iniciar(null, Dificuldade.MEDIO, 5);
+        estado = jogo.iniciar(piloto, dificuldade, limite);
     }
 
     /** Retorna true quando a aplicação deve fechar; nenhum frame vira turno sozinho. */
@@ -30,12 +38,12 @@ public final class ControladorPartida {
         var comando = entrada.ler();
         if (comando.sair()) return true;
         if (comando.reiniciar() && estado.situacao() != Situacao.EM_ANDAMENTO) {
-            estado = jogo.iniciar(estado.piloto(), estado.dificuldade(), estado.limite());
-            eventos = List.of();
+            reiniciar();
         } else if (comando.acao() != Acao.VAZIA && estado.situacao() == Situacao.EM_ANDAMENTO) {
             var resultado = jogo.executar(comando.acao());
             estado = resultado.estado();
             eventos = resultado.eventos();
+            novosResultados.addLast(resultado);
         } else {
             // Apenas o relógio pode avançar nesta consulta; não há execução de ação.
             estado = jogo.consultarEstado();
@@ -47,4 +55,25 @@ public final class ControladorPartida {
     public List<Evento> eventos() { return eventos; }
     public void pausar() { pausado = true; }
     public void retomar() { pausado = false; }
+
+    public void reiniciar() {
+        estado = jogo.iniciar(estado.piloto(), estado.dificuldade(), estado.limite());
+        eventos = List.of();
+        novosResultados.clear();
+        geracao++;
+    }
+
+    public void abortar() {
+        if (estado.situacao() == Situacao.EM_ANDAMENTO) estado = jogo.executar(Acao.ABORTAR).estado();
+        novosResultados.clear();
+    }
+
+    /** Consequências sonoras/visuais consomem cada resultado uma vez. */
+    public List<ResultadoAcao> consumirResultados() {
+        var resultados = List.copyOf(novosResultados);
+        novosResultados.clear();
+        return resultados;
+    }
+
+    public int geracao() { return geracao; }
 }

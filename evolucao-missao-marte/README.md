@@ -14,9 +14,11 @@ LibGDX com os módulos core e lwjgl3. As entregas anteriores continuam preservad
   veja o [projeto Gradle](fases/fase-02-gradle/README.md) e o
   [tutorial da migração](fases/fase-02-gradle/docs/fase-02-tutorial.md).
 - **Fase 3:** aprovada conforme o referencial, implementada com LibGDX 1.12.1,
-  core/lwjgl3 e sprites existentes; testes e janela gráfica validados. Veja o
+  core/lwjgl3, HUD superior, ambiente espacial, menu, pausa e áudio; testes e janela gráfica validados. Veja o
   [projeto LibGDX](fases/fase-03-libgdx/README.md) e o
   [tutorial do framework](fases/fase-03-libgdx/docs/fase-03-tutorial.md).
+  A [reformulação visual de 16/11/2026](fases/fase-03-libgdx/docs/reformulacao-interface.md)
+  foi solicitada como evolução da própria Fase 3, mantendo as regras existentes.
 - **Base dos fontes:** [`../missao2/src/solidexercicio10/`](../missao2/src/solidexercicio10/).
 - **Referência histórica:** [`../missao2/src/exercicio10/`](../missao2/src/exercicio10/).
 
@@ -70,7 +72,7 @@ evolucao-missao-marte/
         ├── build.gradle / settings.gradle
         ├── gradlew / gradlew.bat / gradle/wrapper/
         ├── core/src/main/java/br/unifor/missaomarte/
-        ├── core/assets/images/
+        ├── core/assets/            # sprites, sons, fontes, licenças e referências
         ├── lwjgl3/src/main/java/br/unifor/missaomarte/lwjgl3/
         └── docs/fase-03-tutorial.md
 ```
@@ -87,7 +89,7 @@ fontes da `missao2` ou de outras fases.
 |---|---|---|
 | 1 — Refatoração arquitetural | `fase-01-refatoracao/` | Concluída: 162 verificações aprovadas |
 | 2 — Gradle | `fase-02-gradle/` | Concluída: Gradle 8.7, Java 17 e 162 verificações via JUnit |
-| 3 — LibGDX | `fase-03-libgdx/` | Concluída: dois módulos, sprites, 32 casos JUnit e janela validados; limites/aborto corrigidos |
+| 3 — LibGDX | `fase-03-libgdx/` | Concluída: HUD, menu, pausa, áudio e sprites; 44 casos JUnit e janela validados |
 | 4 — Interface gráfica | `fase-04-interface-grafica/` | Não iniciada |
 | 5 — Servidor e ranking | `fase-05-servidor-ranking/` | Não iniciada |
 | 6 — Android | `fase-06-android/` | Não iniciada |
@@ -113,9 +115,11 @@ e usa nave, inimigo, asteroide e fundo copiados dos assets fornecidos.
 O console está disponível com `./gradlew :lwjgl3:runConsole --console=plain`.
 `./gradlew :lwjgl3:smokeDesktop` executa a verificação gráfica com janela real e
 entrada determinística; `./gradlew :lwjgl3:installDist` gera a distribuição.
-Os 32 casos JUnit incluem um adaptador das 162 verificações herdadas ajustadas,
-além dos testes de coordenação, entrada e regressão. As correções posteriores
-limitam inimigos ao mapa e interrompem o turno ao abortar. Consulte os controles e limites no
+Os 44 casos JUnit incluem um adaptador das 162 verificações herdadas ajustadas,
+além dos testes de coordenação, entrada, regressão e apresentação. As correções
+limitam inimigos ao mapa e interrompem o turno ao abortar. A aplicação inicia
+no menu; P/ESC abrem a pausa e congelam o cronômetro/música. SPACE é apenas um
+controle futuro desativado. Consulte os controles e limites no
 [README da Fase 3](fases/fase-03-libgdx/README.md).
 
 ## Executar a Fase 2
@@ -180,7 +184,6 @@ permanece para a fase correspondente.
 
 ## Continuidade
 
-As Fases 1 e 2 foram aprovadas e implementadas. A Fase 2 é preparada em branch
-própria para revisão por pull request, sem integração automática na `master`.
-A introdução de LibGDX exige planejamento e aprovação da Fase 3, conforme o
-prompt mestre, partindo da versão Gradle concluída.
+As Fases 1, 2 e 3 foram aprovadas e implementadas. A Fase 3 recebeu uma
+reformulação visual autorizada em 16/11/2026. Novas etapas continuam exigindo
+planejamento e aprovação, com revisão por pull request antes de integrar na master.

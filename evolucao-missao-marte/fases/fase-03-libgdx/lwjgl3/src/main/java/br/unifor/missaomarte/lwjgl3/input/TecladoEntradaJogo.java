@@ -35,4 +35,7 @@ public final class TecladoEntradaJogo implements EntradaJogo {
     }
 
     private boolean pressionada(int codigo) { return acabouDePressionar.test(codigo); }
+
+    @Override
+    public boolean pausaSolicitada() { return pressionada(Keys.P); }
 }
