@@ -99,7 +99,7 @@ fontes da `missao2` ou de outras fases.
 | 1 — Refatoração arquitetural | `fase-01-refatoracao/` | Concluída: 162 verificações aprovadas |
 | 2 — Gradle | `fase-02-gradle/` | Concluída: Gradle 8.7, Java 17 e 162 verificações via JUnit |
 | 3 — LibGDX | `fase-03-libgdx/` | Concluída: HUD, menu, pausa, áudio e sprites; 44 casos JUnit e janela validados |
-| 4 — Interface gráfica | `fase-04-interface-grafica/` | Concluída: animações, movimento visual, HUD SpaceRage; 47 casos JUnit e smoke em 3 resoluções |
+| 4 — Interface gráfica | `fase-04-interface-grafica/` | Concluída: animações, movimento visual, HUD SpaceRage; 48 casos JUnit e smoke em 3 resoluções |
 | 5 — Servidor e ranking | `fase-05-servidor-ranking/` | Não iniciada |
 | 6 — Android | `fase-06-android/` | Não iniciada |
 | 7 — Evolução livre | `fase-07-evolucao-livre/` | Não iniciada |
