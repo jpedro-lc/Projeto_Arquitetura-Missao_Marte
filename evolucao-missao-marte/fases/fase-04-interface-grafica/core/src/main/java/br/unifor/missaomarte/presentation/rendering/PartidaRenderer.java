@@ -84,7 +84,7 @@ public final class PartidaRenderer {
         for (var p : estado.passageiros()) {
             batch.setColor(TONS_PASSAGEIRO[switch (p.tipo()) { case "Engenheiro" -> 1; case "Astronauta" -> 2; default -> 0; }]);
             // Fase deslocada pela posição para os astronautas não piscarem em sincronia.
-            desenharImagem(batch, astronauta.getKeyFrame(tempoVisual + (p.x() + p.y()) * 0.13f),
+            desenharImagem(batch, astronauta.getKeyFrame(tempoVisual + defasagem(p.x(), p.y())),
                     origemX + p.x() * passoX, origemY + p.y() * passoY, tamanho * 0.85f);
         }
         batch.setColor(Color.WHITE);
@@ -110,6 +110,9 @@ public final class PartidaRenderer {
             }
         }
     }
+
+    /** Sempre >= 0: Animation.getKeyFrame com tempo negativo devolve índice -1 em LOOP_PINGPONG. */
+    static float defasagem(int x, int y) { return Math.floorMod(x + y, 8) * 0.13f; }
 
     /** Idade da explosão mais recente dentro da janela de dano, ou -1. */
     static float tempoDeDano(EfeitosPartida efeitos) {

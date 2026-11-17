@@ -272,7 +272,7 @@ Com JDK 17 (nesta máquina Windows: `~/.jdks/openjdk-17.0.2`), dentro de
 
 ```bash
 export JAVA_HOME=~/.jdks/openjdk-17.0.2
-./gradlew clean build            # compila e roda 47 casos JUnit
+./gradlew clean build            # compila e roda 48 casos JUnit
 ./gradlew :lwjgl3:run            # jogo gráfico
 ./gradlew :lwjgl3:smokeDesktop   # janela real, 12 capturas em lwjgl3/build/reports/smoke/
 ./gradlew :lwjgl3:runConsole --console=plain
