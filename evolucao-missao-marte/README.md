@@ -22,6 +22,10 @@ LibGDX com os módulos core e lwjgl3. As entregas anteriores continuam preservad
 - **Fase 4:** plano aprovado em 17/11/2026 (opção A: JDK 17), implementada e validada;
   veja o [projeto da interface gráfica](fases/fase-04-interface-grafica/README.md) e o
   [tutorial](fases/fase-04-interface-grafica/docs/fase-04-tutorial.md).
+- **Fase 5:** plano aprovado em 22/11/2026 seguindo o enunciado do professor (modo
+  convidado mantido), implementada e validada; veja o
+  [projeto cliente + servidor](fases/fase-05-servidor-ranking/README.md) e o
+  [tutorial](fases/fase-05-servidor-ranking/docs/fase-05-tutorial.md).
 - **Base dos fontes:** [`../missao2/src/solidexercicio10/`](../missao2/src/solidexercicio10/).
 - **Referência histórica:** [`../missao2/src/exercicio10/`](../missao2/src/exercicio10/).
 
@@ -39,6 +43,8 @@ Não é necessário copiar o repositório, mover as entregas ou criar outro work
   resultados da implementação estão registrados neste índice e na nova fase.
 - [Plano da Fase 3](docs/plano-fase-03.md): organização aprovada conforme o
   referencial, com separação entre regras e apresentação dentro do core.
+- [Plano da Fase 5](docs/plano-fase-05.md): servidor Spring Boot, JWT, JPA e
+  ranking global; registra as divergências com o prompt mestre.
 - [Plano da Fase 4](docs/plano-fase-04.md): interface gráfica com SpaceRage,
   movimento visual e animações, sem alterar regras.
 - [Referencial de API, Gradle e LibGDX](tutorial-api-gradle-libgdx.md): material
@@ -56,7 +62,8 @@ evolucao-missao-marte/
 │   ├── plano-fase-01.md
 │   ├── plano-fase-02.md
 │   ├── plano-fase-03.md
-│   └── plano-fase-04.md
+│   ├── plano-fase-04.md
+│   └── plano-fase-05.md
 └── fases/
     ├── .gitkeep
     ├── fase-01-refatoracao/
@@ -81,9 +88,14 @@ evolucao-missao-marte/
     │   ├── core/assets/            # sprites, sons, fontes, licenças e referências
     │   ├── lwjgl3/src/main/java/br/unifor/missaomarte/lwjgl3/
     │   └── docs/fase-03-tutorial.md
-    └── fase-04-interface-grafica/  # mesma estrutura; apresentação animada
+    ├── fase-04-interface-grafica/  # mesma estrutura; apresentação animada
+    │   ├── README.md
+    │   └── docs/fase-04-tutorial.md
+    └── fase-05-servidor-ranking/
         ├── README.md
-        └── docs/fase-04-tutorial.md
+        ├── cliente/                # Fase 4 evoluída (Gradle 8.7)
+        ├── servidor/               # Spring Boot 4.1.2 (Gradle 9.8.2)
+        └── docs/fase-05-tutorial.md + evidencias/
 ```
 
 Cada pasta de fase será criada somente depois da aprovação do respectivo plano.
@@ -100,12 +112,27 @@ fontes da `missao2` ou de outras fases.
 | 2 — Gradle | `fase-02-gradle/` | Concluída: Gradle 8.7, Java 17 e 162 verificações via JUnit |
 | 3 — LibGDX | `fase-03-libgdx/` | Concluída: HUD, menu, pausa, áudio e sprites; 44 casos JUnit e janela validados |
 | 4 — Interface gráfica | `fase-04-interface-grafica/` | Concluída: animações, movimento visual, HUD SpaceRage; 48 casos JUnit e smoke em 3 resoluções |
-| 5 — Servidor e ranking | `fase-05-servidor-ranking/` | Não iniciada |
+| 5 — Servidor e ranking | `fase-05-servidor-ranking/` | Concluída: servidor com 27 testes MockMvc; cliente com 70 casos JUnit; smoke ponta a ponta |
 | 6 — Android | `fase-06-android/` | Não iniciada |
 | 7 — Evolução livre | `fase-07-evolucao-livre/` | Não iniciada |
 
 Os comandos das fases seguintes serão registrados quando forem implementados e
-verificados. A próxima etapa é a Fase 5, que exige seu próprio plano e aprovação.
+verificados. A próxima etapa é a Fase 6, que exige seu próprio plano e aprovação.
+
+## Executar a Fase 5
+
+Com JDK 17, em dois terminais dentro de `fases/fase-05-servidor-ranking/`:
+
+```bash
+cd servidor && ./gradlew test && ./gradlew bootRun --console=plain
+```
+
+```bash
+cd cliente && ./gradlew clean build && ./gradlew :lwjgl3:run --console=plain
+```
+
+Sem login o jogo funciona como convidado (ranking local). Detalhes, API e
+limitações no [README da Fase 5](fases/fase-05-servidor-ranking/README.md).
 
 ## Executar a Fase 4
 
@@ -206,6 +233,7 @@ permanece para a fase correspondente.
 
 ## Continuidade
 
-As Fases 1, 2 e 3 foram aprovadas e implementadas. A Fase 3 recebeu uma
-reformulação visual autorizada em 16/11/2026. Novas etapas continuam exigindo
+As Fases 1 a 5 foram aprovadas e implementadas. A Fase 3 recebeu uma
+reformulação visual autorizada em 16/11/2026, e a Fase 5 segue o enunciado do
+professor (modo convidado mantido). Novas etapas continuam exigindo
 planejamento e aprovação, com revisão por pull request antes de integrar na master.
