@@ -51,7 +51,7 @@ cd servidor
 
 ```powershell
 cd cliente
-.\gradlew.bat test                      # 81 testes JUnit (core + lwjgl3)
+.\gradlew.bat test                      # 83 testes JUnit (core + lwjgl3)
 .\gradlew.bat :lwjgl3:run --console=plain
 ```
 
@@ -66,8 +66,8 @@ adb reverse tcp:8080 tcp:8080
 .\gradlew.bat :android:assembleDebug
 .\gradlew.bat :android:installDebug
 
-# 2. Emulador Android (10.0.2.2 aponta para o localhost da máquina):
-.\gradlew.bat :android:assembleDebug -Pmissaomarte.servidor=http://10.0.2.2:8080
+# 2. Emulador Android: o mesmo APK detecta o emulador e usa 10.0.2.2 (localhost da máquina):
+.\gradlew.bat :android:installDebug
 
 # 3. Celular físico na mesma rede Wi-Fi (substitua pelo IP da máquina):
 .\gradlew.bat :android:assembleDebug -Pmissaomarte.servidor=http://192.168.1.15:8080
@@ -76,7 +76,7 @@ adb reverse tcp:8080 tcp:8080
 | Onde | Opção | Efeito |
 |---|---|---|
 | Cliente Desktop | `-Dmissaomarte.servidor=http://localhost:8080` | Endereço do servidor no desktop (padrão) |
-| Cliente Android | `-Pmissaomarte.servidor=http://127.0.0.1:8080` | Endereço do servidor embutido no APK (padrão: `127.0.0.1:8080` via `adb reverse` ou `10.0.2.2:8080` no emulador) |
+| Cliente Android | `-Pmissaomarte.servidor=http://IP:8080` | Força o endereço do servidor no APK. Sem a opção, é automático: `10.0.2.2:8080` no emulador e `127.0.0.1:8080` no celular (com `adb reverse`) |
 | Servidor | variável `MISSAOMARTE_BIND` | Interface de rede (`127.0.0.1` padrão; `0.0.0.0` para LAN/Wi-Fi) |
 | Servidor | variável `MISSAOMARTE_JWT_SEGREDO` | Segredo do token (≥ 32 bytes) |
 | Servidor | variável `MISSAOMARTE_DADOS` | Pasta do banco H2 (padrão `servidor/dados`) |
@@ -96,3 +96,10 @@ adb reverse tcp:8080 tcp:8080
 ## Documentação Didática
 
 - [Tutorial da Fase 6 — Adaptação Multiplataforma para Android](docs/fase-06-tutorial.md)
+- [Plano e registro da Fase 6](../../docs/plano-fase-06.md)
+
+## Pendências
+
+- **Capturas no Android:** as evidências em `docs/evidencias/` foram geradas no
+  desktop. As capturas do jogo rodando em um celular Android (via depuração USB)
+  serão anexadas em seguida.
