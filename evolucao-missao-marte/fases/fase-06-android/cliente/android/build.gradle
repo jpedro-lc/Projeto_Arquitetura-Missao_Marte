@@ -1,0 +1,95 @@
+plugins {
+    id 'com.android.application' version '8.3.2'
+}
+
+repositories {
+    google()
+    mavenCentral()
+}
+
+configurations {
+    natives
+}
+
+android {
+    namespace 'br.unifor.missaomarte'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'br.unifor.missaomarte'
+        minSdk 21
+        targetSdk 34
+        versionCode 1
+        versionName '1.0'
+        // Com "adb reverse tcp:8080 tcp:8080", 127.0.0.1:8080 no celular USB roteia direto para o PC.
+        // Para emulador sem adb reverse use 10.0.2.2; para Wi-Fi sem cabo: -Pmissaomarte.servidor=http://192.168.x.x:8080
+        def servidorUrl = project.findProperty('missaomarte.servidor')
+                ?: System.getProperty('missaomarte.servidor', 'http://127.0.0.1:8080')
+        resValue 'string', 'servidor_url', servidorUrl.toString()
+    }
+
+    sourceSets {
+        main {
+            manifest.srcFile 'src/main/AndroidManifest.xml'
+            java.srcDirs = ['src/main/java']
+            res.srcDirs = ['res']
+            assets.srcDirs = [rootProject.file('core/assets')]
+            jniLibs.srcDirs = ['libs']
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+        }
+        release {
+            minifyEnabled false
+        }
+    }
+}
+
+dependencies {
+    implementation project(':core')
+    implementation "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+
+    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
+    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
+    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
+    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
+
+    natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-armeabi-v7a"
+    natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-arm64-v8a"
+    natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86"
+    natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86_64"
+}
+
+// Extrai as bibliotecas nativas (.so) do LibGDX e do FreeType para cada arquitetura Android.
+tasks.register('copyAndroidNatives') {
+    doFirst {
+        ['armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'].each { abi ->
+            file("libs/$abi").mkdirs()
+        }
+        configurations.natives.copy().files.each { jar ->
+            def abi = ['armeabi-v7a', 'arm64-v8a', 'x86_64', 'x86'].find { jar.name.contains("natives-$it") }
+            if (abi != null) {
+                copy {
+                    from zipTree(jar)
+                    into file("libs/$abi")
+                    include '*.so'
+                }
+            }
+        }
+    }
+}
+
+tasks.configureEach { tarefa ->
+    if (tarefa.name.contains('merge') && tarefa.name.contains('JniLibFolders')) {
+        tarefa.dependsOn 'copyAndroidNatives'
+    }
+}

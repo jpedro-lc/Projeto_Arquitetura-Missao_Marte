@@ -1,0 +1,19 @@
+pluginManagement {
+    repositories {
+        google()
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+
+rootProject.name = 'missao-marte-fase-06-cliente'
+include 'core', 'lwjgl3'
+
+// Inclui o módulo :android automaticamente quando o Android SDK estiver configurado
+// (via local.properties, ANDROID_HOME ou ANDROID_SDK_ROOT).
+def localProps = new File(rootDir, 'local.properties')
+def temSdkLocal = localProps.exists() && localProps.getText('UTF-8').contains('sdk.dir')
+def temSdkAmbiente = System.getenv('ANDROID_HOME') != null || System.getenv('ANDROID_SDK_ROOT') != null
+if (temSdkLocal || temSdkAmbiente) {
+    include 'android'
+}
