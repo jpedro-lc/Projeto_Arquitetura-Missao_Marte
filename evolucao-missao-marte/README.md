@@ -29,7 +29,8 @@ LibGDX com os módulos core e lwjgl3. As entregas anteriores continuam preservad
 - **Fase 6:** implementada pela equipe e revisada em 24/11/2026 (registro retroativo no
   plano); desktop e Android compartilham o `core`, com toque, *swipe* e controle
   Bluetooth. Veja o [projeto](fases/fase-06-android/README.md) e o
-  [tutorial](fases/fase-06-android/docs/fase-06-tutorial.md). Capturas no Android pendentes.
+  [tutorial](fases/fase-06-android/docs/fase-06-tutorial.md). Capturas no Android em
+  [`docs/evidencias/android/`](fases/fase-06-android/docs/evidencias/android/).
 - **Base dos fontes:** [`../missao2/src/solidexercicio10/`](../missao2/src/solidexercicio10/).
 - **Referência histórica:** [`../missao2/src/exercicio10/`](../missao2/src/exercicio10/).
 
@@ -125,7 +126,7 @@ fontes da `missao2` ou de outras fases.
 | 3 — LibGDX | `fase-03-libgdx/` | Concluída: HUD, menu, pausa, áudio e sprites; 44 casos JUnit e janela validados |
 | 4 — Interface gráfica | `fase-04-interface-grafica/` | Concluída: animações, movimento visual, HUD SpaceRage; 48 casos JUnit e smoke em 3 resoluções |
 | 5 — Servidor e ranking | `fase-05-servidor-ranking/` | Concluída: servidor com 27 testes MockMvc; cliente com 70 casos JUnit; smoke ponta a ponta |
-| 6 — Android | `fase-06-android/` | Concluída: 27 testes no servidor, 83 no cliente, smokes desktop e APK gerado; capturas no Android pendentes |
+| 6 — Android | `fase-06-android/` | Concluída: 27 testes no servidor, 83 no cliente, smokes desktop, APK testado num celular via USB, com capturas |
 | 7 — Evolução livre | `fase-07-evolucao-livre/` | Não iniciada |
 
 Os comandos das fases seguintes serão registrados quando forem implementados e

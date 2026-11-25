@@ -100,6 +100,8 @@ adb reverse tcp:8080 tcp:8080
 
 ## Pendências
 
-- **Capturas no Android:** as evidências em `docs/evidencias/` foram geradas no
-  desktop. As capturas do jogo rodando em um celular Android (via depuração USB)
-  serão anexadas em seguida.
+Nenhuma. As capturas no Android, antes pendentes, estão em
+[`docs/evidencias/android/`](docs/evidencias/android/): Samsung Galaxy S20 FE 5G
+(SM-G781B, Android 13), por depuração USB com `adb reverse tcp:8080 tcp:8080`,
+APK gerado sem `-P` (endereço automático `127.0.0.1`). As demais imagens de
+`docs/evidencias/` são do desktop.

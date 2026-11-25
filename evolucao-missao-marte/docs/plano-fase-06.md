@@ -80,12 +80,13 @@ foram aceitas.
 | `:android:assembleDebug` | APK gerado, com `INTERNET`, *cleartext* liberado e natives `arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64` |
 | Endereço no APK | Vazio (automático) por padrão; `-P` grava o IP informado |
 | `model`/`service` | SHA-256 igual ao da Fase 5 |
+| Celular real (Galaxy S20 FE 5G, Android 13, USB + `adb reverse`) | Cadastro, login, partida por toque e *swipe*, envio da derrota e histórico lidos do servidor; capturas em `fases/fase-06-android/docs/evidencias/android/` |
 
 ## 7. Pendências e divergências
 
 | Item | Situação |
 |---|---|
 | Plano antes da implementação e PR | Não houve; este registro e o PR de ajustes cobrem a revisão |
-| Capturas no Android | Pendentes. As evidências atuais são do desktop. O tutorial relata o teste num celular físico via USB, mas sem imagens; elas serão anexadas quando houver depuração USB disponível |
+| Capturas no Android | Resolvido em 24/11/2026: 11 capturas num Galaxy S20 FE 5G por depuração USB |
 | Endereço padrão no emulador | Corrigido na revisão: antes o APK levava sempre `127.0.0.1` e o comentário do código dizia o contrário |
 | HTTP sem TLS no Android | Mantido para o ambiente didático/local; produção exigiria HTTPS |

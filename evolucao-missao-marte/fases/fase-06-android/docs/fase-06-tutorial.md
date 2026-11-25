@@ -434,14 +434,31 @@ O APK gerado fica em `cliente/android/build/outputs/apk/debug/android-debug.apk`
 - **Cliente (`cliente`):** `./gradlew test` passou com **83 testes** (os 70 da Fase 5 + 13 novos cobrindo `ToqueEntradaJogo`, gestos de *swipe*, `EntradaComposta`, `RankingLocalRepository`, mapeamento de D-Pad/Gamepad Bluetooth e botão `BACK`, e a escolha automática do endereço do servidor em `EnderecoServidor`).
 - **Verificação Gráfica (`:lwjgl3:smokeDesktop`):** janela real aberta validando renderização, redimensionamento, presença e funcionamento dos controles de toque no `Stage` da `GameScreen`.
 - **Integridade Arquitetural:** `model` e `service` permanecem sem nenhuma alteração, e nenhum arquivo de `model`, `service`, `repository` ou `remoto` importa `com.badlogic`.
-- **Compilação do APK e Execução em Dispositivo Android Real:** o pacote `android-debug.apk` foi gerado com sucesso (Android SDK 34, LibGDX 1.12.1 + natives `armeabi-v7a`, `arm64-v8a`, `x86`, `x86_64`) e validado diretamente em um dispositivo físico Android (**Xiaomi 2412DPC0AG / POCO X7 Pro**) conectado via USB com túnel `adb reverse tcp:8080 tcp:8080` consumindo o servidor Spring Boot local. As capturas desse teste ainda não
-  foram anexadas: as imagens em `docs/evidencias/` são do desktop, e as do
-  Android serão incluídas na próxima revisão.
+- **Compilação do APK e Execução em Dispositivo Android Real:** o pacote `android-debug.apk` foi gerado com sucesso (Android SDK 34, LibGDX 1.12.1 + natives `armeabi-v7a`, `arm64-v8a`, `x86`, `x86_64`) e validado diretamente em um dispositivo físico Android (**Xiaomi 2412DPC0AG / POCO X7 Pro**) conectado via USB com túnel `adb reverse tcp:8080 tcp:8080` consumindo o servidor Spring Boot local. As imagens da raiz de
+  `docs/evidencias/` são do desktop; as do Android estão em `docs/evidencias/android/`
+  (ver abaixo).
 - **Revisão de 24/11/2026:** reexecutados os 27 testes do servidor, os 83 do
   cliente, `smokeDesktop`, `smokeOnline` (82 passos contra o servidor real) e
   `:android:assembleDebug` (APK com permissão `INTERNET`, *cleartext* liberado e
   natives das 4 arquiteturas). O endereço padrão do APK foi corrigido para
   funcionar no emulador sem precisar de `-P` (antes ia sempre `127.0.0.1`).
+- **Teste no celular com capturas (24/11/2026):** Samsung Galaxy S20 FE 5G
+  (SM-G781B, Android 13, `arm64-v8a`, 2400×1080), depuração USB, `adb reverse
+  tcp:8080 tcp:8080` e APK sem `-P`. Roteiro executado só pelo toque:
+
+| Captura | O que mostra |
+|---|---|
+| `android/01-menu-convidado.png` | Menu em modo convidado |
+| `android/02-teclado-virtual-cadastro.png` | Teclado virtual do Android aberto no campo de nome |
+| `android/03-cadastro-senha-mascarada.png` | Criar conta com a senha mascarada |
+| `android/04-menu-logado-servidor.png` | Conta criada no servidor e login feito pelo celular |
+| `android/05-nova-partida.png` | Nova partida com o piloto da conta |
+| `android/06-partida-controles-toque.png` | Partida com os botões de toque no rodapé |
+| `android/07-movimentos-toque-e-swipe.png` | 3 movimentos: 2 pelos botões e 1 por *swipe* no mapa |
+| `android/08-missao-abortada.png` | Missão abortada (não é enviada ao servidor, como na Fase 5) |
+| `android/09-ranking-global-servidor.png` | Ranking global lido do servidor (sem vitórias na base nova) |
+| `android/10-derrota-resultado-enviado.png` | Derrota por limite de movimentos com "Resultado enviado." |
+| `android/11-historico-do-servidor.png` | Histórico lido do servidor com a partida enviada |
 
 ---
 
