@@ -26,6 +26,11 @@ LibGDX com os módulos core e lwjgl3. As entregas anteriores continuam preservad
   convidado mantido), implementada e validada; veja o
   [projeto cliente + servidor](fases/fase-05-servidor-ranking/README.md) e o
   [tutorial](fases/fase-05-servidor-ranking/docs/fase-05-tutorial.md).
+- **Fase 6:** implementada pela equipe e revisada em 24/11/2026 (registro retroativo no
+  plano); desktop e Android compartilham o `core`, com toque, *swipe* e controle
+  Bluetooth. Veja o [projeto](fases/fase-06-android/README.md) e o
+  [tutorial](fases/fase-06-android/docs/fase-06-tutorial.md). Capturas no Android em
+  [`docs/evidencias/android/`](fases/fase-06-android/docs/evidencias/android/).
 - **Base dos fontes:** [`../missao2/src/solidexercicio10/`](../missao2/src/solidexercicio10/).
 - **Referência histórica:** [`../missao2/src/exercicio10/`](../missao2/src/exercicio10/).
 
@@ -43,6 +48,8 @@ Não é necessário copiar o repositório, mover as entregas ou criar outro work
   resultados da implementação estão registrados neste índice e na nova fase.
 - [Plano da Fase 3](docs/plano-fase-03.md): organização aprovada conforme o
   referencial, com separação entre regras e apresentação dentro do core.
+- [Plano da Fase 6](docs/plano-fase-06.md): registro retroativo do Android, decisões,
+  validação e pendências.
 - [Plano da Fase 5](docs/plano-fase-05.md): servidor Spring Boot, JWT, JPA e
   ranking global; registra as divergências com o prompt mestre.
 - [Plano da Fase 4](docs/plano-fase-04.md): interface gráfica com SpaceRage,
@@ -63,7 +70,8 @@ evolucao-missao-marte/
 │   ├── plano-fase-02.md
 │   ├── plano-fase-03.md
 │   ├── plano-fase-04.md
-│   └── plano-fase-05.md
+│   ├── plano-fase-05.md
+│   └── plano-fase-06.md
 └── fases/
     ├── .gitkeep
     ├── fase-01-refatoracao/
@@ -91,11 +99,16 @@ evolucao-missao-marte/
     ├── fase-04-interface-grafica/  # mesma estrutura; apresentação animada
     │   ├── README.md
     │   └── docs/fase-04-tutorial.md
-    └── fase-05-servidor-ranking/
+    ├── fase-05-servidor-ranking/
+    │   ├── README.md
+    │   ├── cliente/                # Fase 4 evoluída (Gradle 8.7)
+    │   ├── servidor/               # Spring Boot 4.1.2 (Gradle 9.8.2)
+    │   └── docs/fase-05-tutorial.md + evidencias/
+    └── fase-06-android/
         ├── README.md
-        ├── cliente/                # Fase 4 evoluída (Gradle 8.7)
-        ├── servidor/               # Spring Boot 4.1.2 (Gradle 9.8.2)
-        └── docs/fase-05-tutorial.md + evidencias/
+        ├── cliente/                # core + lwjgl3 + android (AGP 8.3.2, SDK 34)
+        ├── servidor/               # mesmo servidor, bind configurável
+        └── docs/fase-06-tutorial.md + evidencias/
 ```
 
 Cada pasta de fase será criada somente depois da aprovação do respectivo plano.
@@ -113,11 +126,20 @@ fontes da `missao2` ou de outras fases.
 | 3 — LibGDX | `fase-03-libgdx/` | Concluída: HUD, menu, pausa, áudio e sprites; 44 casos JUnit e janela validados |
 | 4 — Interface gráfica | `fase-04-interface-grafica/` | Concluída: animações, movimento visual, HUD SpaceRage; 48 casos JUnit e smoke em 3 resoluções |
 | 5 — Servidor e ranking | `fase-05-servidor-ranking/` | Concluída: servidor com 27 testes MockMvc; cliente com 70 casos JUnit; smoke ponta a ponta |
-| 6 — Android | `fase-06-android/` | Não iniciada |
+| 6 — Android | `fase-06-android/` | Concluída: 27 testes no servidor, 83 no cliente, smokes desktop, APK testado num celular via USB, com capturas |
 | 7 — Evolução livre | `fase-07-evolucao-livre/` | Não iniciada |
 
 Os comandos das fases seguintes serão registrados quando forem implementados e
-verificados. A próxima etapa é a Fase 6, que exige seu próprio plano e aprovação.
+verificados. A próxima etapa é a Fase 7, que exige seu próprio plano e aprovação.
+
+## Executar a Fase 6
+
+Com JDK 17, dentro de `fases/fase-06-android/`: suba o servidor
+(`cd servidor && ./gradlew bootRun`) e, no cliente, rode o desktop
+(`./gradlew :lwjgl3:run`) ou instale no Android com o SDK configurado
+(`./gradlew :android:installDebug`; no celular USB use antes
+`adb reverse tcp:8080 tcp:8080`). Detalhes no
+[README da Fase 6](fases/fase-06-android/README.md).
 
 ## Executar a Fase 5
 
@@ -233,7 +255,8 @@ permanece para a fase correspondente.
 
 ## Continuidade
 
-As Fases 1 a 5 foram aprovadas e implementadas. A Fase 3 recebeu uma
+As Fases 1 a 5 foram aprovadas e implementadas; a Fase 6 foi implementada pela
+equipe e registrada depois, na revisão de 24/11/2026. A Fase 3 recebeu uma
 reformulação visual autorizada em 16/11/2026, e a Fase 5 segue o enunciado do
 professor (modo convidado mantido). Novas etapas continuam exigindo
 planejamento e aprovação, com revisão por pull request antes de integrar na master.

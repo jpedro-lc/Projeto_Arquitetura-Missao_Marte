@@ -2,6 +2,7 @@ package br.unifor.missaomarte.android;
 
 import java.io.File;
 import java.util.Random;
+import android.os.Build;
 import android.os.Bundle;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
@@ -9,6 +10,7 @@ import br.unifor.missaomarte.MissaoMarteGame;
 import br.unifor.missaomarte.R;
 import br.unifor.missaomarte.presentation.RelogioPausavel;
 import br.unifor.missaomarte.presentation.input.ControleFisicoEntradaJogo;
+import br.unifor.missaomarte.presentation.rede.EnderecoServidor;
 import br.unifor.missaomarte.presentation.rede.ServidorHttp;
 import br.unifor.missaomarte.remoto.SessaoAtual;
 import br.unifor.missaomarte.repository.RankingLocalRepository;
@@ -21,8 +23,6 @@ import br.unifor.missaomarte.service.JogoService;
  * Reutiliza integralmente o módulo :core (regras, telas, controles por toque e cliente HTTP).
  */
 public final class AndroidLauncher extends AndroidApplication {
-    /** No emulador Android (AVD), 10.0.2.2 roteia para o localhost (127.0.0.1) do computador. */
-    public static final String SERVIDOR_EMULADOR = "http://10.0.2.2:8080";
     private static final String ARQUIVO_RANKING = "ranking-solid-exercicio10.json";
 
     @Override
@@ -40,11 +40,17 @@ public final class AndroidLauncher extends AndroidApplication {
         var relogio = new RelogioPausavel(System::currentTimeMillis);
         var jogo = new JogoService(ranking, new FabricaMissoes(), new Random(), relogio);
 
-        String urlRecurso = getString(R.string.servidor_url);
-        String urlServidor = (urlRecurso == null || urlRecurso.isBlank()) ? SERVIDOR_EMULADOR : urlRecurso;
-        var servidor = new ServidorHttp(System.getProperty("missaomarte.servidor", urlServidor));
+        // Endereço do build (-Pmissaomarte.servidor) ou, se vazio, automático: emulador -> 10.0.2.2, celular -> 127.0.0.1.
+        var servidor = new ServidorHttp(EnderecoServidor.android(getString(R.string.servidor_url), emulador()));
 
         // MissaoMarteGame compõe ControleFisicoEntradaJogo (tecla Voltar e controle Bluetooth) com ToqueEntradaJogo.
         initialize(new MissaoMarteGame(jogo, new ControleFisicoEntradaJogo(), relogio, servidor, sessao), configuracao);
+    }
+
+    /** Heurística usual para o AVD do Android Studio (imagens goldfish/ranchu e builds "sdk"/"generic"). */
+    static boolean emulador() {
+        return Build.FINGERPRINT.startsWith("generic") || Build.FINGERPRINT.contains("emulator")
+                || Build.HARDWARE.contains("goldfish") || Build.HARDWARE.contains("ranchu")
+                || Build.PRODUCT.contains("sdk");
     }
 }

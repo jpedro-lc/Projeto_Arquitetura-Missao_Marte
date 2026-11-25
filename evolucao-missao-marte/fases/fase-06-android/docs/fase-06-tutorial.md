@@ -245,7 +245,6 @@ rodape.add(botaoToque(estilo, "MENU", "TOQUE_MENU", () -> { game.audio().selecio
 
 ```java
 public final class AndroidLauncher extends AndroidApplication {
-    public static final String SERVIDOR_EMULADOR = "http://10.0.2.2:8080";
     private static final String ARQUIVO_RANKING = "ranking-solid-exercicio10.json";
 
     @Override
@@ -262,9 +261,9 @@ public final class AndroidLauncher extends AndroidApplication {
         var relogio = new RelogioPausavel(System::currentTimeMillis);
         var jogo = new JogoService(ranking, new FabricaMissoes(), new Random(), relogio);
 
-        String urlRecurso = getString(R.string.servidor_url);
-        String urlServidor = (urlRecurso == null || urlRecurso.isBlank()) ? SERVIDOR_EMULADOR : urlRecurso;
-        var servidor = new ServidorHttp(System.getProperty("missaomarte.servidor", urlServidor));
+        // Endereço do build (-Pmissaomarte.servidor) ou, se vazio, automático:
+        // emulador -> http://10.0.2.2:8080; celular USB -> http://127.0.0.1:8080 (adb reverse).
+        var servidor = new ServidorHttp(EnderecoServidor.android(getString(R.string.servidor_url), emulador()));
 
         initialize(new MissaoMarteGame(jogo, new ControleFisicoEntradaJogo(), relogio, servidor, sessao), configuracao);
     }
@@ -284,7 +283,7 @@ public final class AndroidLauncher extends AndroidApplication {
 | Teclado virtual nos formulários | Não abria ao tocar nos campos | `Gdx.input.setOnscreenKeyboardVisible(true)` ao tocar nos campos de login e nova partida |
 | Botão Voltar do Android | Fechava a Activity | Interceptado (`setCatchKey(Keys.BACK, true)`) para voltar ao menu ou pausar |
 | Ranking local (modo convidado) | `RankingArquivoRepository` em `:lwjgl3` | `RankingLocalRepository` em `:core` (sem LibGDX), gravando em `getFilesDir()` no Android |
-| Endereço padrão do servidor | `http://localhost:8080` | `http://localhost:8080` no Desktop e `http://10.0.2.2:8080` no Android (configurável por `-Pmissaomarte.servidor`) |
+| Endereço padrão do servidor | `http://localhost:8080` | `http://localhost:8080` no Desktop; no Android, automático (`EnderecoServidor`): `http://10.0.2.2:8080` no emulador e `http://127.0.0.1:8080` no celular com `adb reverse` (forçável por `-Pmissaomarte.servidor`) |
 
 ### 8.2. Decisões arquiteturais e padrões utilizados
 
@@ -314,7 +313,7 @@ public final class AndroidLauncher extends AndroidApplication {
 flowchart TB
     subgraph Backends["Raízes de Composição por Plataforma"]
         LW[":lwjgl3<br/>Lwjgl3Launcher<br/>http://localhost:8080"]
-        AN[":android<br/>AndroidLauncher<br/>http://10.0.2.2:8080"]
+        AN[":android<br/>AndroidLauncher<br/>10.0.2.2 (emulador) ou 127.0.0.1 (USB)"]
     end
 
     subgraph Core[":core — Código 100% Compartilhado"]
@@ -404,7 +403,7 @@ $env:MISSAOMARTE_BIND="0.0.0.0"; .\gradlew.bat bootRun --console=plain
 ```powershell
 # Terminal 2 — Cliente (Core + Desktop)
 cd cliente
-.\gradlew.bat test --console=plain      # 81 testes JUnit (sem janela ou rede)
+.\gradlew.bat test --console=plain      # 83 testes JUnit (sem janela ou rede)
 .\gradlew.bat :lwjgl3:run --console=plain
 .\gradlew.bat :lwjgl3:smokeDesktop      # verificação gráfica com controles de toque
 ```
@@ -416,7 +415,8 @@ Com o **Android SDK** instalado (via Android Studio ou `ANDROID_HOME` apontando 
 ```powershell
 cd cliente
 
-# 1. Gerar o APK de depuração para o Emulador (aponta para http://10.0.2.2:8080 por padrão)
+# 1. Gerar o APK de depuração. Sem -P, o endereço é automático no aparelho:
+#    emulador -> http://10.0.2.2:8080; celular USB -> http://127.0.0.1:8080 (com adb reverse tcp:8080 tcp:8080)
 .\gradlew.bat :android:assembleDebug
 
 # 2. Ou gerar o APK apontando para o IP da máquina na rede Wi-Fi (para celular físico)
@@ -431,10 +431,34 @@ O APK gerado fica em `cliente/android/build/outputs/apk/debug/android-debug.apk`
 ### 10.3. Evidências de Validação
 
 - **Servidor (`servidor`):** `./gradlew test` passou com **27 testes** (100% de aprovação).
-- **Cliente (`cliente`):** `./gradlew test` passou com **81 testes** (os 70 da Fase 5 + 11 novos testes cobrindo `ToqueEntradaJogo`, gestos de *swipe*, `EntradaComposta`, `RankingLocalRepository` e mapeamento de D-Pad/Gamepad Bluetooth e botão `BACK`).
+- **Cliente (`cliente`):** `./gradlew test` passou com **83 testes** (os 70 da Fase 5 + 13 novos cobrindo `ToqueEntradaJogo`, gestos de *swipe*, `EntradaComposta`, `RankingLocalRepository`, mapeamento de D-Pad/Gamepad Bluetooth e botão `BACK`, e a escolha automática do endereço do servidor em `EnderecoServidor`).
 - **Verificação Gráfica (`:lwjgl3:smokeDesktop`):** janela real aberta validando renderização, redimensionamento, presença e funcionamento dos controles de toque no `Stage` da `GameScreen`.
 - **Integridade Arquitetural:** `model` e `service` permanecem sem nenhuma alteração, e nenhum arquivo de `model`, `service`, `repository` ou `remoto` importa `com.badlogic`.
-- **Compilação do APK e Execução em Dispositivo Android Real:** o pacote `android-debug.apk` foi gerado com sucesso (Android SDK 34, LibGDX 1.12.1 + natives `armeabi-v7a`, `arm64-v8a`, `x86`, `x86_64`) e validado diretamente em um dispositivo físico Android (**Xiaomi 2412DPC0AG / POCO X7 Pro**) conectado via USB com túnel `adb reverse tcp:8080 tcp:8080` consumindo o servidor Spring Boot local.
+- **Compilação do APK e Execução em Dispositivo Android Real:** o pacote `android-debug.apk` foi gerado com sucesso (Android SDK 34, LibGDX 1.12.1 + natives `armeabi-v7a`, `arm64-v8a`, `x86`, `x86_64`) e validado diretamente em um dispositivo físico Android (**Xiaomi 2412DPC0AG / POCO X7 Pro**) conectado via USB com túnel `adb reverse tcp:8080 tcp:8080` consumindo o servidor Spring Boot local. As imagens da raiz de
+  `docs/evidencias/` são do desktop; as do Android estão em `docs/evidencias/android/`
+  (ver abaixo).
+- **Revisão de 24/11/2026:** reexecutados os 27 testes do servidor, os 83 do
+  cliente, `smokeDesktop`, `smokeOnline` (82 passos contra o servidor real) e
+  `:android:assembleDebug` (APK com permissão `INTERNET`, *cleartext* liberado e
+  natives das 4 arquiteturas). O endereço padrão do APK foi corrigido para
+  funcionar no emulador sem precisar de `-P` (antes ia sempre `127.0.0.1`).
+- **Teste no celular com capturas (24/11/2026):** Samsung Galaxy S20 FE 5G
+  (SM-G781B, Android 13, `arm64-v8a`, 2400×1080), depuração USB, `adb reverse
+  tcp:8080 tcp:8080` e APK sem `-P`. Roteiro executado só pelo toque:
+
+| Captura | O que mostra |
+|---|---|
+| `android/01-menu-convidado.png` | Menu em modo convidado |
+| `android/02-teclado-virtual-cadastro.png` | Teclado virtual do Android aberto no campo de nome |
+| `android/03-cadastro-senha-mascarada.png` | Criar conta com a senha mascarada |
+| `android/04-menu-logado-servidor.png` | Conta criada no servidor e login feito pelo celular |
+| `android/05-nova-partida.png` | Nova partida com o piloto da conta |
+| `android/06-partida-controles-toque.png` | Partida com os botões de toque no rodapé |
+| `android/07-movimentos-toque-e-swipe.png` | 3 movimentos: 2 pelos botões e 1 por *swipe* no mapa |
+| `android/08-missao-abortada.png` | Missão abortada (não é enviada ao servidor, como na Fase 5) |
+| `android/09-ranking-global-servidor.png` | Ranking global lido do servidor (sem vitórias na base nova) |
+| `android/10-derrota-resultado-enviado.png` | Derrota por limite de movimentos com "Resultado enviado." |
+| `android/11-historico-do-servidor.png` | Histórico lido do servidor com a partida enviada |
 
 ---
 

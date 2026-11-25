@@ -21,10 +21,10 @@ android {
         targetSdk 34
         versionCode 1
         versionName '1.0'
-        // Com "adb reverse tcp:8080 tcp:8080", 127.0.0.1:8080 no celular USB roteia direto para o PC.
-        // Para emulador sem adb reverse use 10.0.2.2; para Wi-Fi sem cabo: -Pmissaomarte.servidor=http://192.168.x.x:8080
+        // Vazio = automático no aparelho (EnderecoServidor): emulador -> 10.0.2.2; celular USB -> 127.0.0.1
+        // (com "adb reverse tcp:8080 tcp:8080"). Wi-Fi sem cabo: -Pmissaomarte.servidor=http://192.168.x.x:8080
         def servidorUrl = project.findProperty('missaomarte.servidor')
-                ?: System.getProperty('missaomarte.servidor', 'http://127.0.0.1:8080')
+                ?: System.getProperty('missaomarte.servidor', '')
         resValue 'string', 'servidor_url', servidorUrl.toString()
     }
 
