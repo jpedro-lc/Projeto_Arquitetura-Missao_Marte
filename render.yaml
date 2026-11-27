@@ -1,0 +1,34 @@
+# Blueprint do Render: cria o servidor do Missão Marte (Fase 7) e o banco PostgreSQL gratuito.
+# Guia: evolucao-missao-marte/fases/fase-07-evolucao-livre/servidor/DEPLOY.md
+services:
+  - type: web
+    name: missao-marte-servidor
+    runtime: docker
+    plan: free
+    region: virginia
+    branch: master
+    rootDir: evolucao-missao-marte/fases/fase-07-evolucao-livre/servidor
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/saude
+    autoDeployTrigger: commit
+    # Só refaz o deploy quando o servidor da Fase 7 muda (caminhos relativos à raiz do repositório).
+    buildFilter:
+      paths:
+        - evolucao-missao-marte/fases/fase-07-evolucao-livre/servidor/**
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: missao-marte-banco
+          property: connectionString
+      # Segredo do JWT gerado pelo Render (256 bits); nunca fica no repositório.
+      - key: MISSAOMARTE_JWT_SEGREDO
+        generateValue: true
+
+databases:
+  - name: missao-marte-banco
+    plan: free
+    region: virginia
+    databaseName: missaomarte
+    user: missaomarte
+    # Sem acesso externo: só o servidor, pela rede privada do Render.
+    ipAllowList: []
