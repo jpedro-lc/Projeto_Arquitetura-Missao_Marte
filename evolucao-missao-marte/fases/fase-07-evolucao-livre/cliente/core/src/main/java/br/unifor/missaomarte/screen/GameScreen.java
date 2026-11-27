@@ -29,6 +29,9 @@ import br.unifor.missaomarte.presentation.HudPartida;
 import br.unifor.missaomarte.presentation.assets.RecursosJogo;
 import br.unifor.missaomarte.presentation.rendering.PartidaRenderer;
 import br.unifor.missaomarte.remoto.PartidaConcluida;
+import br.unifor.missaomarte.model.ModoJogo;
+import java.util.EnumMap;
+import java.util.Map;
 
 /** Fundo em tela cheia, HUD, ambiente animado e rodapé, com pausa sobre a mesma partida. */
 public final class GameScreen extends ScreenAdapter {
@@ -57,6 +60,10 @@ public final class GameScreen extends ScreenAdapter {
     private boolean pausado;
     private float tempoVisual;
     private int geracao;
+    /** Botões de direção: no tempo real, segurar mantém a nave andando. */
+    private final Map<Acao, TextButton> direcoes = new EnumMap<>(Acao.class);
+    private final Label contagem;
+    private float mostrarLargada;
 
     public GameScreen(MissaoMarteGame game, ControladorPartida controlador, RecursosJogo recursos) {
         this.game = game;
@@ -102,16 +109,28 @@ public final class GameScreen extends ScreenAdapter {
         rodape.setBackground(recursos.painelRodape());
         rodape.pad(6, 20, 6, 20);
         // Controles interativos por toque (Android e mouse no Desktop): enfileiram intenções em ToqueEntradaJogo.
-        rodape.add(botaoToque(estilo, "ESQ", "TOQUE_ESQUERDA", () -> game.toque().acionar(Acao.ESQUERDA))).size(96, 44).padRight(6);
-        rodape.add(botaoToque(estilo, "CIMA", "TOQUE_CIMA", () -> game.toque().acionar(Acao.CIMA))).size(104, 44).padRight(6);
-        rodape.add(botaoToque(estilo, "BAIXO", "TOQUE_BAIXO", () -> game.toque().acionar(Acao.BAIXO))).size(112, 44).padRight(6);
-        rodape.add(botaoToque(estilo, "DIR", "TOQUE_DIREITA", () -> game.toque().acionar(Acao.DIREITA))).size(96, 44).padRight(18);
+        rodape.add(botaoDirecao(estilo, "ESQ", "TOQUE_ESQUERDA", Acao.ESQUERDA)).size(96, 44).padRight(6);
+        rodape.add(botaoDirecao(estilo, "CIMA", "TOQUE_CIMA", Acao.CIMA)).size(104, 44).padRight(6);
+        rodape.add(botaoDirecao(estilo, "BAIXO", "TOQUE_BAIXO", Acao.BAIXO)).size(112, 44).padRight(6);
+        rodape.add(botaoDirecao(estilo, "DIR", "TOQUE_DIREITA", Acao.DIREITA)).size(96, 44).padRight(18);
         rodape.add(botaoToque(estilo, "EMBARCAR (C)", "TOQUE_EMBARCAR", () -> game.toque().acionar(Acao.EMBARCAR))).size(210, 44).padRight(8);
         rodape.add(botaoToque(estilo, "ABORTAR (Q)", "TOQUE_ABORTAR", () -> game.toque().acionar(Acao.ABORTAR))).size(196, 44).padRight(18);
         rodape.add(botaoToque(estilo, "PAUSA (P)", "TOQUE_PAUSA", () -> game.toque().solicitarPausa())).size(164, 44).padRight(8);
         rodape.add(botaoToque(estilo, "MENU", "TOQUE_MENU", () -> { game.audio().selecionar(); game.mostrarMenu(); })).size(130, 44);
         raiz.add(rodape).growX().height(60);
         stage.addActor(raiz);
+
+        contagem = estilo.valor("");
+        contagem.setName("contagem-largada");
+        contagem.setFontScale(3f);
+        contagem.setAlignment(Align.center);
+        contagem.setTouchable(Touchable.disabled);
+        var camadaContagem = new Table();
+        camadaContagem.setFillParent(true);
+        camadaContagem.setTouchable(Touchable.disabled);
+        // Terço de cima do mapa: a nave larga do centro e não fica escondida atrás do número.
+        camadaContagem.add(contagem).expand().top().padTop(150);
+        stage.addActor(camadaContagem);
 
         resultado.setBackground(recursos.painelPausa());
         resultado.setSize(860, 172);
@@ -155,7 +174,10 @@ public final class GameScreen extends ScreenAdapter {
             if (envio == Envio.ENVIANDO || envio == Envio.FALHOU) {
                 // Partida já encerrada: R tenta reenviar em vez de reiniciar e perder o resultado.
                 if (game.entrada().ler().reiniciar() && envio == Envio.FALHOU) enviar();
-            } else if (game.entrada().pausaSolicitada() || controlador.atualizar()) game.pausarPartida();
+            } else {
+                if (controlador.modo() == ModoJogo.TEMPO_REAL) game.toque().manter(direcaoSegurada());
+                if (game.entrada().pausaSolicitada() || controlador.atualizar(delta)) game.pausarPartida();
+            }
             if (!pausado) {
                 boolean geracaoReiniciada = geracao != controlador.geracao();
                 if (geracaoReiniciada) {
@@ -181,6 +203,7 @@ public final class GameScreen extends ScreenAdapter {
             }
         }
         hud.atualizar(controlador.estado());
+        atualizarContagem(delta);
         var situacao = controlador.estado().situacao();
         resultado.setVisible(!pausado && situacao != Situacao.EM_ANDAMENTO);
         tituloResultado.setText(switch (situacao) {
@@ -269,6 +292,44 @@ public final class GameScreen extends ScreenAdapter {
     }
 
     public Envio envio() { return envio; }
+
+    /** "3", "2", "1" e "VAI!" sobre o mapa; some sozinho depois da largada. */
+    private void atualizarContagem(float delta) {
+        float restante = controlador.contagemRestante();
+        boolean correndo = controlador.estado().situacao() == Situacao.EM_ANDAMENTO;
+        if (restante > 0 && correndo) {
+            contagem.setText(String.valueOf((int) Math.ceil(restante)));
+            mostrarLargada = controlador.modo() == ModoJogo.TEMPO_REAL ? 0.6f : 0f;
+        } else if (mostrarLargada > 0 && correndo) {
+            contagem.setText("VAI!");
+            if (!pausado) mostrarLargada -= delta;
+        } else {
+            contagem.setText("");
+        }
+    }
+
+    private Acao direcaoSegurada() {
+        for (var direcao : direcoes.entrySet()) {
+            if (direcao.getValue().isPressed()) return direcao.getKey();
+        }
+        return Acao.VAZIA;
+    }
+
+    /** Clássico: um passo por clique. Tempo real: o toque já move e segurar continua andando. */
+    private TextButton botaoDirecao(EstiloInterface estilo, String rotulo, String nomeAtor, Acao direcao) {
+        var botao = botaoToque(estilo, rotulo, nomeAtor, () -> {
+            if (controlador.modo() == ModoJogo.CLASSICO) game.toque().acionar(direcao);
+        });
+        botao.addListener(new InputListener() {
+            @Override public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                // Garante o passo mesmo se o dedo sair antes do próximo quadro.
+                if (controlador.modo() == ModoJogo.TEMPO_REAL) game.toque().acionar(direcao);
+                return false;
+            }
+        });
+        direcoes.put(direcao, botao);
+        return botao;
+    }
 
     private static TextButton botaoToque(EstiloInterface estilo, String rotulo, String nomeAtor, Runnable acao) {
         var botao = estilo.botao(rotulo, acao);

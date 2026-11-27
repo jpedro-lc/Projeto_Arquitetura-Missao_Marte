@@ -113,6 +113,8 @@ public final class VerificacaoOnline {
         // Vitória logada: nome vem da conta, resultado vai ao servidor.
         clique.accept("INICIAR JOGO");
         passos.add(new Passo("nova partida", nova, () -> capturar(saida.resolve("04-nova-partida-logado.png"))));
+        // Fase 7: o padrão virou tempo real; este roteiro verifica o modo clássico, preservado.
+        clique.accept("modo-classico");
         clique.accept("DECOLAR");
         passos.add(new Passo("partida", partida, () -> exigir(jogo.consultarEstado().piloto().equals(ana), "Piloto não é a conta")));
         teclas.accept(new int[] {Keys.D, Keys.C, Keys.A});
@@ -128,7 +130,7 @@ public final class VerificacaoOnline {
         clique.accept("VOLTAR");
         // Derrota logada também vai para o histórico (W colide; C repete a colisão).
         passos.add(new Passo("menu", menu, () -> clicar(palco.get(), "INICIAR JOGO")));
-        passos.add(new Passo("nova", nova, () -> clicar(palco.get(), "DECOLAR")));
+        passos.add(new Passo("nova", nova, () -> { clicar(palco.get(), "modo-classico"); clicar(palco.get(), "DECOLAR"); }));
         passos.add(new Passo("partida", partida, () -> { }));
         teclas.accept(new int[] {Keys.W, Keys.C, Keys.C});
         passos.add(new Passo("derrota enviada", enviado, () -> {
@@ -142,7 +144,7 @@ public final class VerificacaoOnline {
         clique.accept("VOLTAR");
         // Servidor cai durante a partida: falha visível, R reenvia quando ele volta.
         passos.add(new Passo("menu", menu, () -> clicar(palco.get(), "INICIAR JOGO")));
-        passos.add(new Passo("nova", nova, () -> clicar(palco.get(), "DECOLAR")));
+        passos.add(new Passo("nova", nova, () -> { clicar(palco.get(), "modo-classico"); clicar(palco.get(), "DECOLAR"); }));
         passos.add(new Passo("partida", partida, () -> servidor.alvo = desligado));
         teclas.accept(new int[] {Keys.D, Keys.C, Keys.A});
         passos.add(new Passo("falha de envio", () -> partida.getAsBoolean()
@@ -181,7 +183,7 @@ public final class VerificacaoOnline {
         }));
         // Convidado continua jogando sem servidor e grava no ranking local.
         passos.add(new Passo("menu", menu, () -> clicar(palco.get(), "INICIAR JOGO")));
-        passos.add(new Passo("nova", nova, () -> clicar(palco.get(), "DECOLAR")));
+        passos.add(new Passo("nova", nova, () -> { clicar(palco.get(), "modo-classico"); clicar(palco.get(), "DECOLAR"); }));
         passos.add(new Passo("partida convidado", partida, () -> { }));
         teclas.accept(new int[] {Keys.D, Keys.C, Keys.A});
         passos.add(new Passo("vitória convidado", () -> jogo.consultarEstado().situacao() == Situacao.VITORIA, () -> {
@@ -197,7 +199,7 @@ public final class VerificacaoOnline {
             digitar.accept(bia + "\t" + senha + "\r");
         }));
         passos.add(new Passo("menu bia", () -> menu.getAsBoolean() && sessao.logado(), () -> clicar(palco.get(), "INICIAR JOGO")));
-        passos.add(new Passo("fácil", nova, () -> { clicar(palco.get(), "FÁCIL"); clicar(palco.get(), "DECOLAR"); }));
+        passos.add(new Passo("fácil", nova, () -> { clicar(palco.get(), "FÁCIL"); clicar(palco.get(), "modo-classico"); clicar(palco.get(), "DECOLAR"); }));
         passos.add(new Passo("partida bia", partida, () -> { }));
         teclas.accept(new int[] {Keys.D, Keys.C, Keys.A});
         passos.add(new Passo("vitória bia", enviado, () -> clicar(palco.get(), "VOLTAR AO MENU")));

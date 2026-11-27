@@ -25,10 +25,15 @@ import br.unifor.missaomarte.screen.MenuScreen;
 import br.unifor.missaomarte.screen.NovaPartidaScreen;
 import br.unifor.missaomarte.screen.RankingScreen;
 import br.unifor.missaomarte.service.JogoService;
+import br.unifor.missaomarte.service.RegrasClassicas;
+import br.unifor.missaomarte.service.RegrasDePartida;
+import br.unifor.missaomarte.service.TempoRealService;
+import br.unifor.missaomarte.model.ModoJogo;
 
 /** Composição da apresentação e navegação; regras, relógio, servidor e sessão vêm do launcher. */
 public final class MissaoMarteGame extends Game {
     private final JogoService jogo;
+    private final RegrasDePartida tempoReal;
     private final ToqueEntradaJogo toque = new ToqueEntradaJogo();
     private final EntradaJogo entrada;
     private final RelogioPausavel relogio;
@@ -39,9 +44,16 @@ public final class MissaoMarteGame extends Game {
     private AudioPartida audio;
     private ControladorPartida controlador;
 
+    /** Tempo real com o mesmo ranking local do JogoService (launchers e verificações das fases anteriores). */
     public MissaoMarteGame(JogoService jogo, EntradaJogo entrada, RelogioPausavel relogio,
                            ServidorDoJogo servidor, SessaoAtual sessao) {
+        this(jogo, new TempoRealService(jogo.ranking()), entrada, relogio, servidor, sessao);
+    }
+
+    public MissaoMarteGame(JogoService jogo, RegrasDePartida tempoReal, EntradaJogo entrada, RelogioPausavel relogio,
+                           ServidorDoJogo servidor, SessaoAtual sessao) {
         this.jogo = Objects.requireNonNull(jogo);
+        this.tempoReal = Objects.requireNonNull(tempoReal);
         this.entrada = new EntradaComposta(Objects.requireNonNull(entrada), toque);
         this.relogio = Objects.requireNonNull(relogio);
         this.servidor = Objects.requireNonNull(servidor);
@@ -58,24 +70,30 @@ public final class MissaoMarteGame extends Game {
         mostrarMenu();
     }
 
-    /** Logado, o piloto é sempre o nome da conta; convidado usa o nome digitado. */
+    /** Modo clássico (como nas Fases 3 a 6); mantido para as verificações que já existiam. */
     public void iniciarPartida(String pilotoConvidado, Dificuldade dificuldade) {
+        iniciarPartida(pilotoConvidado, dificuldade, ModoJogo.CLASSICO);
+    }
+
+    /** Logado, o piloto é sempre o nome da conta; convidado usa o nome digitado. */
+    public void iniciarPartida(String pilotoConvidado, Dificuldade dificuldade, ModoJogo modo) {
         String piloto = sessao.logado() ? sessao.sessao().nome() : pilotoConvidado;
         int limite = controlador == null ? 5 : controlador.estado().limite();
-        comecar(piloto, dificuldade, limite);
+        comecar(piloto, dificuldade, limite, Objects.requireNonNull(modo));
     }
 
     /** Reinício: mesma configuração da partida anterior. */
     public void iniciarPartida() {
         if (controlador == null) { iniciarPartida(null, Dificuldade.MEDIO); return; }
         var anterior = controlador.estado();
-        comecar(anterior.piloto(), anterior.dificuldade(), anterior.limite());
+        comecar(anterior.piloto(), anterior.dificuldade(), anterior.limite(), controlador.modo());
     }
 
-    private void comecar(String piloto, Dificuldade dificuldade, int limite) {
+    private void comecar(String piloto, Dificuldade dificuldade, int limite, ModoJogo modo) {
         toque.limpar();
         relogio.retomar();
-        controlador = new ControladorPartida(jogo, entrada, piloto, dificuldade, limite);
+        RegrasDePartida regras = modo == ModoJogo.TEMPO_REAL ? tempoReal : new RegrasClassicas(jogo);
+        controlador = new ControladorPartida(regras, entrada, piloto, dificuldade, limite);
         trocarTela(new GameScreen(this, controlador, recursos));
         audio.iniciar();
     }

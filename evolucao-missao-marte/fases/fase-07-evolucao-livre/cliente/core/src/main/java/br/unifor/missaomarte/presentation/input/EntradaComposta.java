@@ -34,6 +34,15 @@ public final class EntradaComposta implements EntradaJogo {
     }
 
     @Override
+    public Acao direcaoMantida() {
+        for (EntradaJogo fonte : fontes) {
+            Acao direcao = fonte.direcaoMantida();
+            if (direcao.movimento()) return direcao;
+        }
+        return Acao.VAZIA;
+    }
+
+    @Override
     public boolean pausaSolicitada() {
         boolean solicitada = false;
         for (EntradaJogo fonte : fontes) {

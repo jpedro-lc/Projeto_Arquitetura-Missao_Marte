@@ -141,6 +141,8 @@ public class JogoService {
     public void registrarPontuacao(String nome, int pontuacao) { ranking.salvar(nome, pontuacao); }
     public List<RankingEntry> listarRanking() { return List.copyOf(ranking.listar()); }
     public void limparRanking() { ranking.limpar(); }
+    /** O modo tempo real (Fase 7) grava as vitórias no mesmo ranking local. */
+    public RankingRepository ranking() { return ranking; }
 
     private void encerrar(Situacao situacao) {
         this.situacao = situacao;

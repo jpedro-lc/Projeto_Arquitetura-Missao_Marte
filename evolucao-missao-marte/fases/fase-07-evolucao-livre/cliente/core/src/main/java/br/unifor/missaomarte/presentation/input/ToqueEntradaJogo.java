@@ -12,6 +12,7 @@ public final class ToqueEntradaJogo implements EntradaJogo {
     public static final float LIMIAR_SWIPE = 28f;
     private final ArrayDeque<ComandoEntrada> fila = new ArrayDeque<>();
     private boolean pausaPendente;
+    private Acao mantida = Acao.VAZIA;
 
     public void acionar(Acao acao) {
         Objects.requireNonNull(acao);
@@ -48,9 +49,20 @@ public final class ToqueEntradaJogo implements EntradaJogo {
         return true;
     }
 
+    /** A tela informa, a cada quadro, qual botão de direção o dedo está segurando (ou VAZIA). */
+    public void manter(Acao direcao) {
+        mantida = direcao != null && direcao.movimento() ? direcao : Acao.VAZIA;
+    }
+
+    @Override
+    public Acao direcaoMantida() {
+        return mantida;
+    }
+
     public void limpar() {
         fila.clear();
         pausaPendente = false;
+        mantida = Acao.VAZIA;
     }
 
     @Override
