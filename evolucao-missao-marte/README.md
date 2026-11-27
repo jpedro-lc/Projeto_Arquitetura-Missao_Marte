@@ -127,7 +127,7 @@ fontes da `missao2` ou de outras fases.
 | 4 — Interface gráfica | `fase-04-interface-grafica/` | Concluída: animações, movimento visual, HUD SpaceRage; 48 casos JUnit e smoke em 3 resoluções |
 | 5 — Servidor e ranking | `fase-05-servidor-ranking/` | Concluída: servidor com 27 testes MockMvc; cliente com 70 casos JUnit; smoke ponta a ponta |
 | 6 — Android | `fase-06-android/` | Concluída: 27 testes no servidor, 83 no cliente, smokes desktop, APK testado num celular via USB, com capturas |
-| 7 — Evolução livre | `fase-07-evolucao-livre/` | Não iniciada |
+| 7 — Evolução livre | `fase-07-evolucao-livre/` | Em andamento: [plano aprovado](docs/plano-fase-07.md); etapa 7.1 (servidor no Render) pronta para o deploy |
 
 Os comandos das fases seguintes serão registrados quando forem implementados e
 verificados. A próxima etapa é a Fase 7, que exige seu próprio plano e aprovação.
