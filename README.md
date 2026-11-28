@@ -53,6 +53,18 @@ as vidas ou os pontos.
 - **Rankings:** 9 tabelas, uma para cada modo e dificuldade, por pontos. São
   globais (servidor na nuvem) para quem tem conta e locais para convidados.
 
+### 🎮 Controles
+
+| Ação | PC (teclado ou controle) | Celular |
+|---|---|---|
+| Mover | `W A S D`, setas ou D-Pad (segurar no tempo real) | Direcional em cruz, translúcido sobre o mapa (segurar mantém a nave andando) |
+| Embarcar | `C` / botão A | Botão **EMBARCAR** sobre o mapa |
+| Pausar | `P` / Start | Botão Pausa ou tecla Voltar |
+| Abortar | `Q` / botão B | Botão Abortar |
+
+O servidor gratuito dorme depois de 15 min sem uso. O primeiro login pode levar
+até 1 minuto, e o jogo avisa na tela enquanto conecta.
+
 ---
 
 ## 🧭 Evolução arquitetural
@@ -131,7 +143,8 @@ com ranking local. Detalhes no
 
 | Pasta / arquivo | Conteúdo |
 |---|---|
-| [`evolucao-missao-marte/`](evolucao-missao-marte/README.md) | Fases 1 a 6 da evolução, planos, tutoriais e evidências |
+| [`evolucao-missao-marte/`](evolucao-missao-marte/README.md) | Fases 1 a 7 da evolução, planos, tutoriais e evidências |
+| [`render.yaml`](render.yaml) | Blueprint do Render: cria o servidor e o banco PostgreSQL na nuvem |
 | [`missao2/`](missao2/) | Entrega da Missão 2: versão original e versão revisada com SOLID, UML |
 | [`missao1/`](missao1/) | Entrega da Missão 1: primeira versão do jogo em console |
 | [`design_patterns/`](design_patterns/) | Estudo de padrões de projeto (Singleton) |
