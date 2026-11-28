@@ -5,6 +5,7 @@ Evolução da Fase 6 com o **servidor na nuvem**, jogo em **tempo real**, modo
 na tela do celular e um **pacote para a apresentação** que roda sem instalar
 nada. Plano aprovado: [`plano-fase-07.md`](../../docs/plano-fase-07.md);
 tutorial: [`docs/fase-07-tutorial.md`](docs/fase-07-tutorial.md).
+Resumo das novidades: [`RESUMO-FASE-07.md`](RESUMO-FASE-07.md).
 
 > **Para a apresentação:** baixe a Release
 > [v7.0-apresentacao](https://github.com/jpedro-lc/Projeto_Arquitetura-Missao_Marte/releases/tag/v7.0-apresentacao)
