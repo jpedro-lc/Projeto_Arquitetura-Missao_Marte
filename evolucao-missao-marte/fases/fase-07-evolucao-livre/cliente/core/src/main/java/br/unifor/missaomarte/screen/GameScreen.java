@@ -188,6 +188,7 @@ public final class GameScreen extends ScreenAdapter {
                 boolean geracaoReiniciada = geracao != controlador.geracao();
                 if (geracaoReiniciada) {
                     efeitos.limpar();
+                    hud.reiniciar();
                     game.audio().iniciar();
                     geracao = controlador.geracao();
                     envio = Envio.NENHUM;

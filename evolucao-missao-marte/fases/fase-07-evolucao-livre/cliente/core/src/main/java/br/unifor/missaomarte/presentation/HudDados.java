@@ -23,6 +23,17 @@ public record HudDados(String pontos, String dificuldade, String movimentos, Str
         };
     }
 
+    /** Corações no HUD: o máximo de vidas (modo Infinito). */
+    public static final int CORACOES_MAXIMOS = br.unifor.missaomarte.service.ProgressaoInfinita.VIDAS_MAXIMAS;
+
+    /**
+     * Quantos corações aparecem: ao menos 3 (as vidas iniciais) ou o maior número de vidas já tido na partida,
+     * para as perdidas aparecerem vazias.
+     */
+    public static int espacosDeVida(int vidas, int pico) {
+        return Math.min(CORACOES_MAXIMOS, Math.max(3, Math.max(vidas, pico)));
+    }
+
     /** 75 -> "01:15". */
     public static String tempo(long segundos) {
         long s = Math.max(0, segundos);
