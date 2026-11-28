@@ -171,6 +171,14 @@ public final class MissaoMarteGame extends Game {
     public AudioPartida audio() { return audio; }
     public EntradaJogo entrada() { return entrada; }
     public ToqueEntradaJogo toque() { return toque; }
+    /**
+     * Direcional e Embarcar por cima do mapa: no Android (sem teclado). No desktop, -Dmissaomarte.toque=true
+     * mostra o mesmo layout para testar com o mouse.
+     */
+    public boolean controlesNaTela() {
+        return (Gdx.app != null && Gdx.app.getType() == com.badlogic.gdx.Application.ApplicationType.Android)
+                || Boolean.getBoolean("missaomarte.toque");
+    }
     public RecursosJogo recursos() { return recursos; }
     public JogoService jogo() { return jogo; }
     public ServidorDoJogo servidor() { return servidor; }

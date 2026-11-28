@@ -8,6 +8,10 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.function.IntBinaryOperator;
+import br.unifor.missaomarte.model.Acao;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
@@ -50,8 +54,9 @@ public final class RecursosJogo implements Disposable {
     public static final String ERRO = "sounds/efeitos/erro_acao.ogg";
     private final AssetManager gerenciador = new AssetManager();
     private final Texture pixel;
-    private final Texture coracaoCheio = criarCoracao(true);
-    private final Texture coracaoVazio = criarCoracao(false);
+    private final Texture coracaoCheio = desenhar(DesenhoCoracao.LARGURA, DesenhoCoracao.ALTURA, (x, y) -> DesenhoCoracao.cor(x, y, true));
+    private final Texture coracaoVazio = desenhar(DesenhoCoracao.LARGURA, DesenhoCoracao.ALTURA, (x, y) -> DesenhoCoracao.cor(x, y, false));
+    private final Map<Acao, Texture> setas = new EnumMap<>(Acao.class);
     private final List<BitmapFont> fontes = new ArrayList<>();
     private final BitmapFont pequena;
     private final BitmapFont media;
@@ -107,13 +112,13 @@ public final class RecursosJogo implements Disposable {
         } finally { mapa.dispose(); }
     }
 
-    /** Vidas do HUD (Fase 7): desenho de DesenhoCoracao; o filtro Nearest padrão mantém os pixels nítidos ao ampliar. */
-    private static Texture criarCoracao(boolean cheio) {
-        Pixmap mapa = new Pixmap(DesenhoCoracao.LARGURA, DesenhoCoracao.ALTURA, Pixmap.Format.RGBA8888);
+    /** Desenhos por código da Fase 7 (corações, setas); o filtro Nearest padrão mantém os pixels nítidos ao ampliar. */
+    private static Texture desenhar(int largura, int altura, IntBinaryOperator cor) {
+        Pixmap mapa = new Pixmap(largura, altura, Pixmap.Format.RGBA8888);
         try {
             mapa.setBlending(Pixmap.Blending.None);
-            for (int y = 0; y < DesenhoCoracao.ALTURA; y++) {
-                for (int x = 0; x < DesenhoCoracao.LARGURA; x++) mapa.drawPixel(x, y, DesenhoCoracao.cor(x, y, cheio));
+            for (int y = 0; y < altura; y++) {
+                for (int x = 0; x < largura; x++) mapa.drawPixel(x, y, cor.applyAsInt(x, y));
             }
             return new Texture(mapa);
         } finally { mapa.dispose(); }
@@ -128,6 +133,10 @@ public final class RecursosJogo implements Disposable {
     public Music musica(String caminho) { return gerenciador.get(caminho, Music.class); }
     public Texture pixel() { return pixel; }
     public Texture coracao(boolean cheio) { return cheio ? coracaoCheio : coracaoVazio; }
+    /** Seta do direcional na tela; criada na primeira vez que a partida pede. */
+    public Texture seta(Acao direcao) {
+        return setas.computeIfAbsent(direcao, d -> desenhar(DesenhoSeta.LADO, DesenhoSeta.LADO, (x, y) -> DesenhoSeta.cor(x, y, d)));
+    }
     public BitmapFont pequena() { return pequena; }
     public BitmapFont media() { return media; }
     public BitmapFont titulo() { return titulo; }
@@ -147,6 +156,7 @@ public final class RecursosJogo implements Disposable {
         pixel.dispose();
         coracaoCheio.dispose();
         coracaoVazio.dispose();
+        for (Texture seta : setas.values()) seta.dispose();
         gerenciador.dispose();
     }
 }

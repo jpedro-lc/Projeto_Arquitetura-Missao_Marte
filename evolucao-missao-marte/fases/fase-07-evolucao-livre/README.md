@@ -12,6 +12,9 @@
 > O restante deste README descreve a base herdada da Fase 6 e será reescrito ao
 > fim da fase.
 
+> **Para a apresentação:** jogo pronto para outro Windows (Java embutido, sem
+> instalar nada) e APK apontando para a nuvem: veja [`APRESENTACAO.md`](APRESENTACAO.md).
+
 **Novidades da etapa 7.1:**
 - `GET /api/saude` público (verificação de saúde do Render e "acordar" o servidor).
 - Porta lida de `PORT`; banco PostgreSQL lido de `DATABASE_URL` (`UrlDoBanco`
@@ -76,6 +79,15 @@
 - Verificação com janela real: `.\gradlew.bat :lwjgl3:smokeInfinito`
   (capturas em [`docs/evidencias/infinito/`](docs/evidencias/infinito/)).
 
+**Direcional na tela (só no celular):** setas em cruz no canto esquerdo e um
+botão **EMBARCAR** grande no direito, **por cima do mapa e translúcidos** (50%):
+o mapa continua do tamanho da tela e os elementos aparecem por trás deles. No
+tempo real, segurar a seta mantém a nave andando. O rodapé do celular fica com
+Abortar, Pausa e Menu. No **desktop**, o layout é o de antes (botões de texto no
+rodapé); `-Dmissaomarte.toque=true` mostra o layout do celular para testar com o
+mouse. As setas são desenhadas por código (`DesenhoSeta`). Testado no Galaxy S20
+FE; capturas em [`docs/evidencias/direcional/`](docs/evidencias/direcional/).
+
 **Vidas com corações:** o HUD troca as mini-naves por corações pixel-art
 desenhados por código (`DesenhoCoracao`, sem imagem de terceiros). Cheios são
 vidas; vazios, as perdidas. Aparecem até 5 (o máximo do Infinito), o que também
@@ -137,7 +149,7 @@ cd servidor
 
 ```powershell
 cd cliente
-.\gradlew.bat test                      # 129 testes JUnit (core + lwjgl3)
+.\gradlew.bat test                      # 132 testes JUnit (core + lwjgl3)
 .\gradlew.bat :lwjgl3:run --console=plain
 ```
 
