@@ -62,7 +62,7 @@ public final class NovaPartidaScreen extends TelaPainel {
             var botao = botao(nomeModo(m), () -> escolherModo(m));
             botao.setName("modo-" + m.name().toLowerCase());
             modos[m.ordinal()] = botao;
-            linhaModo.add(botao).size(289, 52).padRight(8);
+            linhaModo.add(botao).size(190, 52).padRight(8);
         }
         conteudo.add(linhaModo).padBottom(18).row();
         if (!logado) {
@@ -117,7 +117,8 @@ public final class NovaPartidaScreen extends TelaPainel {
     static String nomeModo(ModoJogo m) {
         return switch (m) {
             case TEMPO_REAL -> "TEMPO REAL";
-            case CLASSICO -> "CLÁSSICO (TURNOS)";
+            case INFINITO -> "INFINITO";
+            case CLASSICO -> "CLÁSSICO";
         };
     }
 

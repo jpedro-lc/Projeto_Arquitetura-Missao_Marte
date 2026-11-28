@@ -14,11 +14,17 @@ public class Nave extends EntidadeMapa implements Movel {
     }
 
     public Nave(String nome, int x, int y, int capacidade) {
+        this(nome, x, y, capacidade, 3);
+    }
+
+    /** Modo Infinito: as vidas passam de um setor para o outro. */
+    public Nave(String nome, int x, int y, int capacidade, int vidas) {
         super(x, y);
+        if (vidas < 1) throw new IllegalArgumentException("A nave precisa de ao menos uma vida");
         this.nome = nome;
         this.passageiros = new ArrayList<>();
         this.capacidade = capacidade;
-        this.vidas = 3;
+        this.vidas = vidas;
     }
 
     public String getNome() {

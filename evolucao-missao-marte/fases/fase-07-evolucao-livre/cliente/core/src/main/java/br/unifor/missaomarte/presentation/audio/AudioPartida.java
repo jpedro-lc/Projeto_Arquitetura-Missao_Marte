@@ -50,7 +50,7 @@ public final class AudioPartida {
                     sons.add(asteroide ? RecursosJogo.IMPACTO_ASTEROIDE : RecursosJogo.IMPACTO_INIMIGO);
                 }
                 case EMBARCOU -> sons.add(RecursosJogo.RESGATE);
-                case VITORIA -> sons.add(RecursosJogo.VITORIA);
+                case VITORIA, SETOR_CONCLUIDO -> sons.add(RecursosJogo.VITORIA);
                 case SEM_PASSAGEIRO, NAVE_CHEIA, COMANDO_INVALIDO -> sons.add(RecursosJogo.ERRO);
                 default -> { }
             }

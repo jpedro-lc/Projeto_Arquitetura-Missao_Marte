@@ -77,6 +77,7 @@ public final class ControladorPartida {
     public List<Evento> eventos() { return eventos; }
     public ModoJogo modo() { return regras.modo(); }
     public float contagemRestante() { return regras.contagemRestante(); }
+    public int setor() { return regras.setor(); }
     public void pausar() { pausado = true; }
     public void retomar() { pausado = false; }
 

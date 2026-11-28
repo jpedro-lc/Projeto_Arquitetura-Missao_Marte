@@ -63,6 +63,8 @@ public final class GameScreen extends ScreenAdapter {
     /** Botões de direção: no tempo real, segurar mantém a nave andando. */
     private final Map<Acao, TextButton> direcoes = new EnumMap<>(Acao.class);
     private final Label contagem;
+    /** Modo Infinito: "SETOR n" acima do mapa durante toda a corrida. */
+    private final Label setor;
     private float mostrarLargada;
 
     public GameScreen(MissaoMarteGame game, ControladorPartida controlador, RecursosJogo recursos) {
@@ -129,7 +131,11 @@ public final class GameScreen extends ScreenAdapter {
         camadaContagem.setFillParent(true);
         camadaContagem.setTouchable(Touchable.disabled);
         // Terço de cima do mapa: a nave larga do centro e não fica escondida atrás do número.
-        camadaContagem.add(contagem).expand().top().padTop(150);
+        setor = estilo.valor("");
+        setor.setName("setor-infinito");
+        setor.setAlignment(Align.center);
+        camadaContagem.add(setor).expandX().top().padTop(130).row();
+        camadaContagem.add(contagem).expand().top().padTop(4);
         stage.addActor(camadaContagem);
 
         resultado.setBackground(recursos.painelPausa());
@@ -175,7 +181,7 @@ public final class GameScreen extends ScreenAdapter {
                 // Partida já encerrada: R tenta reenviar em vez de reiniciar e perder o resultado.
                 if (game.entrada().ler().reiniciar() && envio == Envio.FALHOU) enviar();
             } else {
-                if (controlador.modo() == ModoJogo.TEMPO_REAL) game.toque().manter(direcaoSegurada());
+                if (controlador.modo() != ModoJogo.CLASSICO) game.toque().manter(direcaoSegurada());
                 if (game.entrada().pausaSolicitada() || controlador.atualizar(delta)) game.pausarPartida();
             }
             if (!pausado) {
@@ -208,7 +214,7 @@ public final class GameScreen extends ScreenAdapter {
         resultado.setVisible(!pausado && situacao != Situacao.EM_ANDAMENTO);
         tituloResultado.setText(switch (situacao) {
             case VITORIA -> "RESGATE CONCLUÍDO";
-            case DERROTA -> "FIM DE MISSÃO";
+            case DERROTA -> controlador.modo() == ModoJogo.INFINITO ? "FIM DA CORRIDA — SETOR " + controlador.setor() : "FIM DE MISSÃO";
             case ABORTADA -> "MISSÃO ABORTADA";
             default -> "";
         });
@@ -222,10 +228,11 @@ public final class GameScreen extends ScreenAdapter {
 
     private void aoEncerrar(br.unifor.missaomarte.model.EstadoPartida estado) {
         if (estado.situacao() == Situacao.EM_ANDAMENTO || envio != Envio.NENHUM) return;
-        var concluida = PartidaConcluida.de(estado);
+        var concluida = PartidaConcluida.de(estado, controlador.modo(), controlador.setor());
         if (concluida.isEmpty()) return;
         if (!game.sessao().logado()) {
-            if (estado.situacao() == Situacao.VITORIA) informar("Modo convidado: vitória salva no ranking local.", EstiloInterface.CIANO);
+            if (controlador.modo() == ModoJogo.INFINITO) informar("Modo convidado: corrida salva no ranking local.", EstiloInterface.CIANO);
+            else if (estado.situacao() == Situacao.VITORIA) informar("Modo convidado: vitória salva no ranking local.", EstiloInterface.CIANO);
             return;
         }
         pendente = concluida.get();
@@ -245,7 +252,10 @@ public final class GameScreen extends ScreenAdapter {
             if (resposta.ok()) {
                 envio = Envio.ENVIADO;
                 informar("Resultado enviado.", EstiloInterface.CIANO);
-                if (partida.resultado() == PartidaConcluida.Resultado.VITORIA) posicaoNoRanking();
+                // No Infinito toda corrida conta para o ranking (lá não há vitória).
+                if (partida.resultado() == PartidaConcluida.Resultado.VITORIA || partida.modo() == ModoJogo.INFINITO) {
+                    posicaoNoRanking(partida);
+                }
             } else if (resposta.naoAutorizado()) {
                 envio = Envio.ENVIADO;
                 game.sessaoExpirada();
@@ -258,9 +268,9 @@ public final class GameScreen extends ScreenAdapter {
         });
     }
 
-    private void posicaoNoRanking() {
+    private void posicaoNoRanking(PartidaConcluida partida) {
         var sessao = game.sessao().sessao();
-        game.servidor().carregarRanking(sessao, resposta -> {
+        game.servidor().carregarRanking(sessao, partida.modo(), partida.dificuldade(), resposta -> {
             if (!ativa || !resposta.ok()) return;
             var linhas = resposta.valor();
             for (var linha : linhas) {
@@ -295,11 +305,12 @@ public final class GameScreen extends ScreenAdapter {
 
     /** "3", "2", "1" e "VAI!" sobre o mapa; some sozinho depois da largada. */
     private void atualizarContagem(float delta) {
+        setor.setText(controlador.modo() == ModoJogo.INFINITO ? "SETOR " + controlador.setor() : "");
         float restante = controlador.contagemRestante();
         boolean correndo = controlador.estado().situacao() == Situacao.EM_ANDAMENTO;
         if (restante > 0 && correndo) {
             contagem.setText(String.valueOf((int) Math.ceil(restante)));
-            mostrarLargada = controlador.modo() == ModoJogo.TEMPO_REAL ? 0.6f : 0f;
+            mostrarLargada = controlador.modo() != ModoJogo.CLASSICO ? 0.6f : 0f;
         } else if (mostrarLargada > 0 && correndo) {
             contagem.setText("VAI!");
             if (!pausado) mostrarLargada -= delta;
@@ -323,7 +334,7 @@ public final class GameScreen extends ScreenAdapter {
         botao.addListener(new InputListener() {
             @Override public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 // Garante o passo mesmo se o dedo sair antes do próximo quadro.
-                if (controlador.modo() == ModoJogo.TEMPO_REAL) game.toque().acionar(direcao);
+                if (controlador.modo() != ModoJogo.CLASSICO) game.toque().acionar(direcao);
                 return false;
             }
         });

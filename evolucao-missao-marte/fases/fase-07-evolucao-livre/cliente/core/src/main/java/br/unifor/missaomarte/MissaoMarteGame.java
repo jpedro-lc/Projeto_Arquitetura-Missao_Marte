@@ -24,6 +24,7 @@ import br.unifor.missaomarte.screen.LoginScreen;
 import br.unifor.missaomarte.screen.MenuScreen;
 import br.unifor.missaomarte.screen.NovaPartidaScreen;
 import br.unifor.missaomarte.screen.RankingScreen;
+import br.unifor.missaomarte.service.InfinitoService;
 import br.unifor.missaomarte.service.JogoService;
 import br.unifor.missaomarte.service.RegrasClassicas;
 import br.unifor.missaomarte.service.RegrasDePartida;
@@ -34,6 +35,7 @@ import br.unifor.missaomarte.model.ModoJogo;
 public final class MissaoMarteGame extends Game {
     private final JogoService jogo;
     private final RegrasDePartida tempoReal;
+    private final RegrasDePartida infinito;
     private final ToqueEntradaJogo toque = new ToqueEntradaJogo();
     private final EntradaJogo entrada;
     private final RelogioPausavel relogio;
@@ -47,13 +49,19 @@ public final class MissaoMarteGame extends Game {
     /** Tempo real com o mesmo ranking local do JogoService (launchers e verificações das fases anteriores). */
     public MissaoMarteGame(JogoService jogo, EntradaJogo entrada, RelogioPausavel relogio,
                            ServidorDoJogo servidor, SessaoAtual sessao) {
-        this(jogo, new TempoRealService(jogo.ranking()), entrada, relogio, servidor, sessao);
+        this(jogo, new TempoRealService(jogo.ranking()), new InfinitoService(jogo.ranking()), entrada, relogio, servidor, sessao);
     }
 
     public MissaoMarteGame(JogoService jogo, RegrasDePartida tempoReal, EntradaJogo entrada, RelogioPausavel relogio,
                            ServidorDoJogo servidor, SessaoAtual sessao) {
+        this(jogo, tempoReal, new InfinitoService(jogo.ranking()), entrada, relogio, servidor, sessao);
+    }
+
+    public MissaoMarteGame(JogoService jogo, RegrasDePartida tempoReal, RegrasDePartida infinito, EntradaJogo entrada,
+                           RelogioPausavel relogio, ServidorDoJogo servidor, SessaoAtual sessao) {
         this.jogo = Objects.requireNonNull(jogo);
         this.tempoReal = Objects.requireNonNull(tempoReal);
+        this.infinito = Objects.requireNonNull(infinito);
         this.entrada = new EntradaComposta(Objects.requireNonNull(entrada), toque);
         this.relogio = Objects.requireNonNull(relogio);
         this.servidor = Objects.requireNonNull(servidor);
@@ -92,7 +100,11 @@ public final class MissaoMarteGame extends Game {
     private void comecar(String piloto, Dificuldade dificuldade, int limite, ModoJogo modo) {
         toque.limpar();
         relogio.retomar();
-        RegrasDePartida regras = modo == ModoJogo.TEMPO_REAL ? tempoReal : new RegrasClassicas(jogo);
+        RegrasDePartida regras = switch (modo) {
+            case TEMPO_REAL -> tempoReal;
+            case INFINITO -> infinito;
+            case CLASSICO -> new RegrasClassicas(jogo);
+        };
         controlador = new ControladorPartida(regras, entrada, piloto, dificuldade, limite);
         trocarTela(new GameScreen(this, controlador, recursos));
         audio.iniciar();

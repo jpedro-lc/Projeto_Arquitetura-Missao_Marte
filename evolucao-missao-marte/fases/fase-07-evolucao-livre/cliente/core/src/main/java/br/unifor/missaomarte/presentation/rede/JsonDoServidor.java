@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonWriter;
 import br.unifor.missaomarte.model.Dificuldade;
+import br.unifor.missaomarte.model.ModoJogo;
 import br.unifor.missaomarte.remoto.LinhaRanking;
 import br.unifor.missaomarte.remoto.PartidaConcluida;
 import br.unifor.missaomarte.remoto.PartidaRegistrada;
@@ -26,8 +27,13 @@ public final class JsonDoServidor {
     }
 
     public static String partida(PartidaConcluida p) {
-        return escrever(w -> w.set("dificuldade", p.dificuldade().name()).set("resultado", p.resultado().name())
-                .set("pontuacao", p.pontuacao()).set("duracaoSegundos", p.duracaoSegundos()).set("movimentos", p.movimentos()));
+        return escrever(w -> {
+            w.set("dificuldade", p.dificuldade().name()).set("resultado", p.resultado().name())
+                    .set("pontuacao", p.pontuacao()).set("duracaoSegundos", p.duracaoSegundos()).set("movimentos", p.movimentos())
+                    .set("modo", p.modo().name());
+            // O servidor recusa setor fora do Infinito: o campo só vai quando existe.
+            if (p.modo() == ModoJogo.INFINITO) w.set("setor", p.setor());
+        });
     }
 
     public static String lerToken(String corpo) {
@@ -50,7 +56,8 @@ public final class JsonDoServidor {
         var lista = new ArrayList<LinhaRanking>();
         for (JsonValue v = lista(corpo).child; v != null; v = v.next) {
             lista.add(new LinhaRanking(v.getInt("posicao"), v.getString("nome"), v.getInt("pontuacao"),
-                    Dificuldade.valueOf(v.getString("dificuldade")), v.getLong("duracaoSegundos")));
+                    Dificuldade.valueOf(v.getString("dificuldade")), v.getLong("duracaoSegundos"),
+                    modo(v), v.getInt("setor", 0)));
         }
         return lista;
     }
@@ -81,7 +88,14 @@ public final class JsonDoServidor {
     private static PartidaRegistrada partida(JsonValue v) {
         return new PartidaRegistrada(v.getLong("id"), Dificuldade.valueOf(v.getString("dificuldade")),
                 PartidaConcluida.Resultado.valueOf(v.getString("resultado")), v.getInt("pontuacao"),
-                v.getLong("duracaoSegundos"), v.getInt("movimentos"), Instant.parse(v.getString("registradaEm")));
+                v.getLong("duracaoSegundos"), v.getInt("movimentos"), Instant.parse(v.getString("registradaEm")),
+                modo(v), v.getInt("setor", 0));
+    }
+
+    /** Servidor das Fases 5 e 6 (ou setor nulo) não manda o campo: vale clássico. */
+    private static ModoJogo modo(JsonValue v) {
+        String texto = v.getString("modo", null);
+        return texto == null ? ModoJogo.CLASSICO : ModoJogo.valueOf(texto);
     }
 
     private static JsonValue ler(String corpo) {

@@ -6,6 +6,8 @@ import java.util.function.Function;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Net;
 import com.badlogic.gdx.net.HttpRequestBuilder;
+import br.unifor.missaomarte.model.Dificuldade;
+import br.unifor.missaomarte.model.ModoJogo;
 import br.unifor.missaomarte.remoto.LinhaRanking;
 import br.unifor.missaomarte.remoto.PartidaConcluida;
 import br.unifor.missaomarte.remoto.PartidaRegistrada;
@@ -46,6 +48,12 @@ public final class ServidorHttp implements ServidorDoJogo {
 
     @Override public void carregarRanking(Sessao sessao, Retorno<List<LinhaRanking>> retorno) {
         chamar(Net.HttpMethods.GET, "/api/ranking", null, sessao, JsonDoServidor::lerRanking, retorno);
+    }
+
+    @Override public void carregarRanking(Sessao sessao, ModoJogo modo, Dificuldade dificuldade,
+                                          Retorno<List<LinhaRanking>> retorno) {
+        chamar(Net.HttpMethods.GET, "/api/ranking?modo=" + modo.name() + "&dificuldade=" + dificuldade.name(), null, sessao,
+                JsonDoServidor::lerRanking, retorno);
     }
 
     @Override public void carregarHistorico(Sessao sessao, Retorno<List<PartidaRegistrada>> retorno) {
