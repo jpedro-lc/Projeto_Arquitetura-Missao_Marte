@@ -79,11 +79,14 @@
 - Verificação com janela real: `.\gradlew.bat :lwjgl3:smokeInfinito`
   (capturas em [`docs/evidencias/infinito/`](docs/evidencias/infinito/)).
 
-**Direcional na tela:** setas em cruz à esquerda do mapa (segurar mantém a
-nave andando no tempo real) e um botão **EMBARCAR** grande à direita, em colunas
-próprias para não cobrir o mapa; o rodapé ficou só com Abortar, Pausa e Menu.
-As setas também são desenhadas por código (`DesenhoSeta`). Capturas em
-[`docs/evidencias/direcional/`](docs/evidencias/direcional/).
+**Direcional na tela (só no celular):** setas em cruz no canto esquerdo e um
+botão **EMBARCAR** grande no direito, **por cima do mapa e translúcidos** (50%):
+o mapa continua do tamanho da tela e os elementos aparecem por trás deles. No
+tempo real, segurar a seta mantém a nave andando. O rodapé do celular fica com
+Abortar, Pausa e Menu. No **desktop**, o layout é o de antes (botões de texto no
+rodapé); `-Dmissaomarte.toque=true` mostra o layout do celular para testar com o
+mouse. As setas são desenhadas por código (`DesenhoSeta`). Testado no Galaxy S20
+FE; capturas em [`docs/evidencias/direcional/`](docs/evidencias/direcional/).
 
 **Vidas com corações:** o HUD troca as mini-naves por corações pixel-art
 desenhados por código (`DesenhoCoracao`, sem imagem de terceiros). Cheios são
