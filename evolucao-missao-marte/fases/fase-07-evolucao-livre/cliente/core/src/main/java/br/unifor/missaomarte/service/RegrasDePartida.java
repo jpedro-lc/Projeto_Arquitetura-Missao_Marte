@@ -20,4 +20,6 @@ public interface RegrasDePartida {
     EstadoPartida consultarEstado();
     /** Segundos da contagem antes da largada; 0 quando a partida já corre. */
     default float contagemRestante() { return 0f; }
+    /** Modo Infinito: setor atual (1, 2, ...); 0 nos modos de partida única. */
+    default int setor() { return 0; }
 }

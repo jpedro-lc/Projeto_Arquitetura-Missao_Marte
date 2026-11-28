@@ -66,17 +66,30 @@ public final class TempoRealService implements RegrasDePartida {
     @Override public EstadoPartida iniciar(String piloto, Dificuldade dificuldade, int limite) {
         Objects.requireNonNull(dificuldade);
         if (limite <= 0) throw new IllegalArgumentException("O limite deve ser positivo");
-        this.missao = fabrica.criar(dificuldade, limite);
-        this.ritmo = Objects.requireNonNull(ritmos.apply(dificuldade));
-        this.piloto = piloto == null || piloto.isBlank() ? "Piloto Anônimo" : piloto.trim();
-        this.dificuldade = dificuldade;
-        this.limite = limite;
         // Mesmo saldo inicial do clássico; aqui ele escoa 1 ponto por segundo.
-        this.pontos = switch (dificuldade) {
+        return iniciarSetor(piloto, dificuldade, limite, fabrica.criar(dificuldade, limite),
+                Objects.requireNonNull(ritmos.apply(dificuldade)), pontosIniciais(dificuldade));
+    }
+
+    /** Saldo de pontos ao começar (e, no Infinito, a recarga de cada setor). */
+    public static int pontosIniciais(Dificuldade dificuldade) {
+        return switch (dificuldade) {
             case FACIL -> 30;
             case MEDIO -> 20;
             case DIFICIL -> 15;
         };
+    }
+
+    /** Começa uma missão já montada (o Infinito monta um setor por vez), com a contagem de largada. */
+    EstadoPartida iniciarSetor(String piloto, Dificuldade dificuldade, int limite, Missao missao,
+                               RitmoTempoReal ritmo, int pontos) {
+        if (limite <= 0) throw new IllegalArgumentException("O limite deve ser positivo");
+        this.missao = Objects.requireNonNull(missao);
+        this.ritmo = Objects.requireNonNull(ritmo);
+        this.piloto = piloto == null || piloto.isBlank() ? "Piloto Anônimo" : piloto.trim();
+        this.dificuldade = Objects.requireNonNull(dificuldade);
+        this.limite = limite;
+        this.pontos = pontos;
         movimentos = 0;
         segundos = 0;
         contagem = ritmo.contagem();
@@ -161,7 +174,8 @@ public final class TempoRealService implements RegrasDePartida {
         if (missao.todosEmbarcados() && situacao == Situacao.EM_ANDAMENTO) {
             if (nave.getX() == 0 && nave.getY() == 0) {
                 situacao = Situacao.VITORIA;
-                ranking.salvar(piloto, pontos, dificuldade, nave.getPassageiros().size(), (long) segundos);
+                ranking.salvar(piloto, pontos, dificuldade, nave.getPassageiros().size(), (long) segundos,
+                        ModoJogo.TEMPO_REAL, 0);
                 eventos.add(new Evento(TipoEvento.VITORIA, "", 0));
             } else if (!avisouRetorno) {
                 avisouRetorno = true;

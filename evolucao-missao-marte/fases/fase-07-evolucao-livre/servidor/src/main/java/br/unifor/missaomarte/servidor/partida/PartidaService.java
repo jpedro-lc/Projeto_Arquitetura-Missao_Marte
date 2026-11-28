@@ -20,7 +20,7 @@ public class PartidaService {
     public PartidaResposta registrar(Long usuarioId, PartidaRequisicao r) {
         var usuario = usuarios.getReferenceById(usuarioId);
         var partida = partidas.save(new Partida(usuario, r.dificuldade(), r.resultado(), r.pontuacao(),
-                r.duracaoSegundos(), r.movimentos()));
+                r.duracaoSegundos(), r.movimentos(), r.modoOuClassico(), r.setor()));
         return PartidaResposta.de(partida);
     }
 

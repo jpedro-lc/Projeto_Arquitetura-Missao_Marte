@@ -47,6 +47,15 @@ public class Partida {
     @Column(name = "registrada_em", nullable = false)
     private Instant registradaEm;
 
+    // Fase 7. Coluna anulável para o ddl-auto=update conseguir acrescentá-la a uma tabela com dados;
+    // MigracaoModo preenche as partidas antigas com CLASSICO ao iniciar.
+    @Enumerated(EnumType.STRING)
+    @Column(length = 12)
+    private ModoJogo modo;
+
+    /** Só no modo Infinito: setor alcançado. */
+    private Integer setor;
+
     protected Partida() { }
 
     public Partida(Usuario usuario, Dificuldade dificuldade, Resultado resultado, int pontuacao,
@@ -58,6 +67,14 @@ public class Partida {
         this.duracaoSegundos = duracaoSegundos;
         this.movimentos = movimentos;
         this.registradaEm = Instant.now();
+        this.modo = ModoJogo.CLASSICO;
+    }
+
+    public Partida(Usuario usuario, Dificuldade dificuldade, Resultado resultado, int pontuacao,
+                   long duracaoSegundos, int movimentos, ModoJogo modo, Integer setor) {
+        this(usuario, dificuldade, resultado, pontuacao, duracaoSegundos, movimentos);
+        this.modo = modo;
+        this.setor = setor;
     }
 
     public Long getId() { return id; }
@@ -68,4 +85,6 @@ public class Partida {
     public long getDuracaoSegundos() { return duracaoSegundos; }
     public int getMovimentos() { return movimentos; }
     public Instant getRegistradaEm() { return registradaEm; }
+    public ModoJogo getModo() { return modo == null ? ModoJogo.CLASSICO : modo; }
+    public Integer getSetor() { return setor; }
 }

@@ -7,7 +7,7 @@
 > |---|---|---|
 > | 7.1 | Servidor publicado no **Render** (Docker + PostgreSQL) | No ar em `https://missao-marte-servidor.onrender.com` ([`servidor/DEPLOY.md`](servidor/DEPLOY.md)) |
 > | 7.2 | Jogo em **tempo real** (modo clássico por turnos mantido) | Pronta (ver abaixo) |
-> | 7.3 | Modo **Infinito** e rankings por modo e dificuldade | Não iniciada |
+> | 7.3 | Modo **Infinito** e rankings por modo e dificuldade | Pronta (ver abaixo) |
 >
 > O restante deste README descreve a base herdada da Fase 6 e será reescrito ao
 > fim da fase.
@@ -40,12 +40,41 @@
   adapta o `JogoService` das fases anteriores, que só ganhou o getter
   `ranking()` para o tempo real gravar no mesmo ranking local.
 - Pausa (botão, `P` ou app em segundo plano) congela o tempo real.
-- Até a etapa 7.3, o servidor ainda não recebe o modo: vitórias dos dois modos
-  entram no mesmo ranking global.
+- Desde a etapa 7.3, o servidor recebe o modo e cada modo tem seus rankings.
 - Os roteiros `smokeDesktop` e `smokeOnline` agora escolhem **Clássico** antes
   de decolar (o padrão mudou) e continuam verificando o modo por turnos.
 - Verificação com janela e relógio reais: `.\gradlew.bat :lwjgl3:smokeTempoReal`
   (capturas em [`docs/evidencias/tempo-real/`](docs/evidencias/tempo-real/)).
+
+**Novidades da etapa 7.3 (Infinito e rankings):**
+
+- **Modo Infinito** (tempo real): o jogador escolhe a dificuldade e joga setores
+  em sequência. Concluir um setor (todos os passageiros e volta à base) leva ao
+  próximo, com nova contagem; pontos e vidas passam adiante.
+
+  | A cada setor *n* | Regra (`ProgressaoInfinita`) |
+  |---|---|
+  | Inimigos | +1 a cada 2 setores |
+  | Asteroides | +1 a cada 3 setores |
+  | Passo dos inimigos | × 0,92 por setor, mínimo 0,25 s |
+  | Mapa | +1 casa de raio a cada 4 setores, até 7 |
+  | Pontos | recarga de 30/20/15 (Fácil/Médio/Difícil) ao entrar no setor |
+  | Vidas | as que sobraram; +1 nos setores 6, 11, 16... (máximo 5) |
+
+  A corrida termina quando acabam as vidas ou os pontos; o resultado guardado é
+  a **pontuação** e o **setor alcançado**. Abortar não registra, como nos outros modos.
+- **Rankings:** 9 tabelas, uma para cada **modo** (Tempo real, Infinito,
+  Clássico) e **dificuldade**, sempre ordenadas por **pontos** (decisão D3).
+  Tempo real e Clássico contam vitórias; no Infinito conta toda corrida.
+  A tela de ranking tem abas (setas também trocam); o local do convidado segue
+  as mesmas abas.
+- **Servidor:** `Partida` ganhou `modo` e `setor`; `GET /api/ranking?modo=…&dificuldade=…`.
+  Sem parâmetros, devolve o ranking antigo (contrato das Fases 5 e 6).
+  Requisição sem `modo` vale `CLASSICO`; `setor` só é aceito (e é obrigatório)
+  no Infinito. Partidas gravadas antes ficam como `CLASSICO` (`MigracaoModo`).
+- Histórico mostra o modo (com o setor no Infinito).
+- Verificação com janela real: `.\gradlew.bat :lwjgl3:smokeInfinito`
+  (capturas em [`docs/evidencias/infinito/`](docs/evidencias/infinito/)).
 
 ## Base herdada da Fase 6
 
@@ -88,7 +117,7 @@ máquinas sem Android SDK.
 
 ```powershell
 cd servidor
-.\gradlew.bat test                      # 33 testes
+.\gradlew.bat test                      # 41 testes
 .\gradlew.bat bootRun --console=plain
 ```
 
@@ -102,7 +131,7 @@ cd servidor
 
 ```powershell
 cd cliente
-.\gradlew.bat test                      # 106 testes JUnit (core + lwjgl3)
+.\gradlew.bat test                      # 126 testes JUnit (core + lwjgl3)
 .\gradlew.bat :lwjgl3:run --console=plain
 ```
 

@@ -13,12 +13,15 @@ import br.unifor.missaomarte.remoto.Resposta;
 public abstract class TelaCarregavel extends TelaPainel {
     public enum Estado { CARREGANDO, PRONTO, ERRO }
     private final Table corpo = new Table();
+    /** Fica entre o título e o conteúdo e não some ao recarregar (abas do ranking). */
+    protected final Table cabecalho = new Table();
     private Estado estado = Estado.CARREGANDO;
     private boolean ativa = true;
 
     protected TelaCarregavel(MissaoMarteGame game, RecursosJogo recursos, String titulo) {
         super(game, recursos, 960);
         conteudo.add(estilo.valor(titulo)).padBottom(20).row();
+        conteudo.add(cabecalho).row();
         conteudo.add(corpo).minHeight(380).row();
         var botoes = new Table();
         botoes.add(botao("RECARREGAR", this::carregar)).size(240, 52).padRight(12);

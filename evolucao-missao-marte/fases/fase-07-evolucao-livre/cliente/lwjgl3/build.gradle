@@ -69,6 +69,21 @@ tasks.register('smokeTempoReal', JavaExec) {
             .getOrElse(layout.buildDirectory.dir('reports/smoke-tempo-real').get().asFile.absolutePath)
 }
 
+tasks.register('smokeInfinito', JavaExec) {
+    group = 'verification'
+    description = 'Abre a janela e joga o modo Infinito: setor 1, setor 2, fim da corrida e aba Infinito do ranking local.'
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'br.unifor.missaomarte.lwjgl3.VerificacaoInfinito'
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+    jvmArgs application.applicationDefaultJvmArgs
+    workingDir = rootProject.projectDir
+    args providers.gradleProperty('smokeOutput')
+            .getOrElse(layout.buildDirectory.dir('reports/smoke-infinito').get().asFile.absolutePath)
+}
+
 // Ponta a ponta: exige o servidor no ar (cd ../servidor; gradlew bootRun). Gera as capturas da Fase 5.
 tasks.register('smokeOnline', JavaExec) {
     group = 'verification'

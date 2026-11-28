@@ -15,7 +15,20 @@ public class FabricaMissoes {
         return criarNovaMissao(dificuldade, -limite, limite, -limite, limite);
     }
 
+    /**
+     * Modo Infinito: mesmo sorteio do criar(), com obstáculos extras e as vidas que a nave já tinha.
+     * Os extras entram depois dos sorteios originais (só aumentam as quantidades); criar() não muda.
+     */
+    public Missao criarSetor(Dificuldade dificuldade, int limite, int asteroidesExtras, int inimigosExtras, int vidas) {
+        return criarNovaMissao(dificuldade, -limite, limite, -limite, limite, asteroidesExtras, inimigosExtras, vidas);
+    }
+
     private Missao criarNovaMissao(Dificuldade dificuldade, int minX, int maxX, int minY, int maxY) {
+        return criarNovaMissao(dificuldade, minX, maxX, minY, maxY, 0, 0, 3);
+    }
+
+    private Missao criarNovaMissao(Dificuldade dificuldade, int minX, int maxX, int minY, int maxY,
+                                   int asteroidesExtras, int inimigosExtras, int vidas) {
         int qtdPassageiros = 4;
         int qtdAsteroides = 2;
         int qtdInimigos = 2;
@@ -28,7 +41,9 @@ public class FabricaMissoes {
             qtdInimigos = 3;
         }
 
-        Nave nave = new Nave("A-1", 0, 0, qtdPassageiros);
+        qtdAsteroides += asteroidesExtras;
+        qtdInimigos += inimigosExtras;
+        Nave nave = new Nave("A-1", 0, 0, qtdPassageiros, vidas);
         Missao missao = new Missao(nave);
 
         posicionarPassageiros(missao, qtdPassageiros, minX, maxX, minY, maxY, nave);
