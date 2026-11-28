@@ -2,16 +2,19 @@
 
 Jogo em Java desenvolvido na disciplina de **Projeto e Arquitetura de Sistemas
 (UNIFOR)**. Começou como um jogo de console e foi evoluindo, fase a fase, até
-virar um jogo gráfico com LibGDX, servidor de ranking com Spring Boot e versão
-Android, sempre preservando as regras do jogo e aplicando princípios SOLID e
-padrões de projeto.
+virar um jogo gráfico em tempo real com LibGDX, servidor de ranking publicado na
+nuvem (Spring Boot no Render) e versão Android, sempre preservando as regras do
+jogo e aplicando princípios SOLID e padrões de projeto.
+
+> **Jogar agora:** baixe a [Release da apresentação](https://github.com/jpedro-lc/Projeto_Arquitetura-Missao_Marte/releases/tag/v7.0-apresentacao):
+> zip do Windows (Java embutido, é só extrair e clicar em `Jogar Missao Marte.bat`) e APK do Android.
 
 **Repositório:** [jpedro-lc/Projeto_Arquitetura-Missao_Marte](https://github.com/jpedro-lc/Projeto_Arquitetura-Missao_Marte)
 · **Acompanhamento:** [GitHub Project "Missão Marte — Evolução Arquitetural"](https://github.com/users/jpedro-lc/projects/16)
 
 | Desktop (LibGDX) | Android (celular real) |
 |---|---|
-| ![Partida no desktop](evolucao-missao-marte/fases/fase-06-android/docs/evidencias/15-partida-controles-toque.png) | ![Partida no Android](evolucao-missao-marte/fases/fase-06-android/docs/evidencias/android/06-partida-controles-toque.png) |
+| ![Partida no desktop](evolucao-missao-marte/fases/fase-07-evolucao-livre/docs/evidencias/tempo-real/05-inimigos-andando.png) | ![Partida no Android](evolucao-missao-marte/fases/fase-07-evolucao-livre/docs/evidencias/direcional/02-celular-elementos-visiveis-atras-das-setas.png) |
 
 ---
 
@@ -33,13 +36,22 @@ essencial (astronautas, o **Professor** e o **Engenheiro**) perdida pelo espaço
 desviando de **asteroides** e **inimigos**, e voltar à base antes que acabem
 as vidas ou os pontos.
 
-- **Navegação em grade 2D**, um movimento por turno; os inimigos se movem a cada turno.
+- **Três modos:**
+  - **Tempo real** (padrão): os inimigos andam sozinhos e a nave anda enquanto a
+    direção está pressionada.
+  - **Infinito**: setores em sequência, cada um mais difícil, com pontos e vidas
+    acumulados.
+  - **Clássico**: por turnos, como nas primeiras fases.
 - **Pontuação:** a partida começa com 30, 20 ou 15 pontos (Fácil, Médio,
-  Difícil); cada movimento custa 1 ponto e cada passageiro embarcado soma a sua
-  pontuação. Chegar a zero é derrota.
-- **Vidas:** a nave tem 3; colidir com asteroide ou inimigo custa uma.
-- **Vitória:** embarcar todos os passageiros e retornar à base.
-- **Ranking:** local para convidados e global (servidor) para jogadores com conta.
+  Difícil). No tempo real perde 1 ponto por segundo; no clássico, 1 por
+  movimento. Cada passageiro embarcado soma a sua pontuação. Chegar a zero é
+  derrota.
+- **Vidas (corações):** a nave tem 3; colidir com asteroide ou inimigo custa uma.
+  No Infinito há vida extra a cada 5 setores, até 5.
+- **Vitória:** embarcar todos os passageiros e retornar à base. No Infinito,
+  isso leva ao próximo setor.
+- **Rankings:** 9 tabelas, uma para cada modo e dificuldade, por pontos. São
+  globais (servidor na nuvem) para quem tem conta e locais para convidados.
 
 ---
 
@@ -58,17 +70,17 @@ request. O guia completo, com os comandos de cada fase, está em
 | [4 — Interface gráfica](evolucao-missao-marte/fases/fase-04-interface-grafica/README.md) | Animações, movimento visual e HUD no estilo SpaceRage | ✅ 48 testes |
 | [5 — Servidor e ranking](evolucao-missao-marte/fases/fase-05-servidor-ranking/README.md) | API Spring Boot com contas, JWT, BCrypt, histórico e ranking global | ✅ 27 + 70 testes |
 | [6 — Android](evolucao-missao-marte/fases/fase-06-android/README.md) | APK com toque, *swipe* e controle físico, mesmo `core` e mesmo servidor | ✅ 27 + 83 testes, testado em celular |
-| 7 — Evolução livre | A definir | ⏳ Backlog |
+| [7 — Evolução livre](evolucao-missao-marte/fases/fase-07-evolucao-livre/README.md) | Servidor no Render, tempo real, modo Infinito, 9 rankings, corações, direcional no celular e pacote da apresentação | ✅ 41 + 132 testes, testado em celular |
 
 Os planos de cada fase ficam em [`evolucao-missao-marte/docs/`](evolucao-missao-marte/docs/)
 e as regras de trabalho em [`PROMPT_MESTRE.md`](evolucao-missao-marte/PROMPT_MESTRE.md).
 
 ---
 
-## 🏗️ Arquitetura atual (Fase 6)
+## 🏗️ Arquitetura atual (Fase 7)
 
 ```
-servidor/  Spring Boot 4 · JPA/H2 · Spring Security (JWT HS256, BCrypt) · OpenAPI
+servidor/  Spring Boot 4 · JPA (PostgreSQL no Render, H2 local) · Spring Security (JWT HS256, BCrypt) · OpenAPI · Docker
 cliente/
 ├── core/     regras do jogo + telas Scene2D (código compartilhado)
 ├── lwjgl3/   launcher desktop
@@ -77,14 +89,15 @@ cliente/
 
 - O `core` mantém as regras (`model`, `service`) sem dependência de LibGDX; a
   apresentação (telas, entrada, rede) fica separada.
-- **Padrões aplicados:** Port and Adapter (`ServidorDoJogo` / `ServidorHttp`,
+- **Padrões aplicados:** Strategy (`RegrasDePartida`: Clássico, Tempo real e
+  Infinito), Adapter (`RegrasClassicas`), Port and Adapter (`ServidorDoJogo` / `ServidorHttp`,
   `EntradaJogo` / adaptadores de toque e controle), Composite
   (`EntradaComposta`), Decorator (`RankingSomenteConvidado`), Template Method
   (telas-base), Repository e Composition Root por plataforma.
 - **Pilares de POO** desde a Missão 1: herança e polimorfismo nas entidades do
   mapa, encapsulamento das regras e pontuação, abstração da nave e da missão.
 
-**Tecnologias:** Java 17 · Gradle · LibGDX 1.12.1 · Spring Boot 4.1 · H2 ·
+**Tecnologias:** Java 17 · Gradle · LibGDX 1.12.1 · Spring Boot 4.1 · PostgreSQL / H2 · Docker · Render ·
 Android SDK 34 (minSdk 21) · JUnit 5 · MockMvc.
 
 ---
@@ -96,22 +109,21 @@ Android SDK 34 (minSdk 21) · JUnit 5 · MockMvc.
 > [`APRESENTACAO.md`](evolucao-missao-marte/fases/fase-07-evolucao-livre/APRESENTACAO.md).
 
 Pré-requisitos: **JDK 17** e, para o Android, o **Android SDK** (Android Studio).
-Dentro de `evolucao-missao-marte/fases/fase-06-android/`:
+Dentro de `evolucao-missao-marte/fases/fase-07-evolucao-livre/cliente/`, usando o
+servidor publicado (`https://missao-marte-servidor.onrender.com`):
 
 ```bash
-# 1. Servidor de ranking (http://localhost:8080, Swagger em /swagger-ui/index.html)
-cd servidor && ./gradlew bootRun
+# Jogo no desktop
+./gradlew :lwjgl3:run "-Dmissaomarte.servidor=https://missao-marte-servidor.onrender.com"
 
-# 2. Jogo no desktop (outro terminal)
-cd cliente && ./gradlew :lwjgl3:run
-
-# 3. Jogo no Android (celular com depuração USB ou emulador)
-adb reverse tcp:8080 tcp:8080
-cd cliente && ./gradlew :android:installDebug
+# Jogo no Android (celular com depuração USB)
+./gradlew :android:installDebug "-Pmissaomarte.servidor=https://missao-marte-servidor.onrender.com"
 ```
 
-Sem servidor o jogo funciona em **modo convidado**, com ranking local. Detalhes
-e solução de problemas no [README da Fase 6](evolucao-missao-marte/fases/fase-06-android/README.md).
+Para rodar o servidor localmente: `cd ../servidor && ./gradlew bootRun`, e use
+`:lwjgl3:run` sem a opção. Sem servidor, o jogo funciona em **modo convidado**,
+com ranking local. Detalhes no
+[README da Fase 7](evolucao-missao-marte/fases/fase-07-evolucao-livre/README.md).
 
 ---
 

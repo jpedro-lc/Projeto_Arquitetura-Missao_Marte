@@ -31,6 +31,13 @@ LibGDX com os módulos core e lwjgl3. As entregas anteriores continuam preservad
   Bluetooth. Veja o [projeto](fases/fase-06-android/README.md) e o
   [tutorial](fases/fase-06-android/docs/fase-06-tutorial.md). Capturas no Android em
   [`docs/evidencias/android/`](fases/fase-06-android/docs/evidencias/android/).
+- **Fase 7:** plano aprovado em 27/11/2026 e entregue em 28/11/2026 (PRs #18 a #22).
+  Tem servidor no Render (Docker + PostgreSQL), jogo em tempo real (clássico
+  mantido), modo Infinito, 9 rankings por modo e dificuldade, corações, direcional
+  no celular e pacote da apresentação
+  ([Release](https://github.com/jpedro-lc/Projeto_Arquitetura-Missao_Marte/releases/tag/v7.0-apresentacao)).
+  Veja o [projeto](fases/fase-07-evolucao-livre/README.md) e o
+  [tutorial](fases/fase-07-evolucao-livre/docs/fase-07-tutorial.md).
 - **Base dos fontes:** [`../missao2/src/solidexercicio10/`](../missao2/src/solidexercicio10/).
 - **Referência histórica:** [`../missao2/src/exercicio10/`](../missao2/src/exercicio10/).
 
@@ -48,6 +55,8 @@ Não é necessário copiar o repositório, mover as entregas ou criar outro work
   resultados da implementação estão registrados neste índice e na nova fase.
 - [Plano da Fase 3](docs/plano-fase-03.md): organização aprovada conforme o
   referencial, com separação entre regras e apresentação dentro do core.
+- [Plano da Fase 7](docs/plano-fase-07.md): evolução livre aprovada (nuvem, tempo real,
+  Infinito e rankings), com as decisões D1 a D5 e o registro da entrega.
 - [Plano da Fase 6](docs/plano-fase-06.md): registro retroativo do Android, decisões,
   validação e pendências.
 - [Plano da Fase 5](docs/plano-fase-05.md): servidor Spring Boot, JWT, JPA e
@@ -127,10 +136,25 @@ fontes da `missao2` ou de outras fases.
 | 4 — Interface gráfica | `fase-04-interface-grafica/` | Concluída: animações, movimento visual, HUD SpaceRage; 48 casos JUnit e smoke em 3 resoluções |
 | 5 — Servidor e ranking | `fase-05-servidor-ranking/` | Concluída: servidor com 27 testes MockMvc; cliente com 70 casos JUnit; smoke ponta a ponta |
 | 6 — Android | `fase-06-android/` | Concluída: 27 testes no servidor, 83 no cliente, smokes desktop, APK testado num celular via USB, com capturas |
-| 7 — Evolução livre | `fase-07-evolucao-livre/` | Em andamento: [plano aprovado](docs/plano-fase-07.md); etapa 7.1 (servidor no Render) pronta para o deploy |
+| 7 — Evolução livre | `fase-07-evolucao-livre/` | Concluída: 41 testes no servidor, 132 no cliente, 4 smokes com janela, deploy no Render e teste em celular |
 
-Os comandos das fases seguintes serão registrados quando forem implementados e
-verificados. A próxima etapa é a Fase 7, que exige seu próprio plano e aprovação.
+As sete fases previstas no prompt mestre estão concluídas. Novas evoluções exigem
+plano próprio e aprovação.
+
+## Executar a Fase 7
+
+Com JDK 17, dentro de `fases/fase-07-evolucao-livre/`:
+
+```powershell
+cd servidor; .\gradlew.bat test                       # 41 testes
+cd ..\cliente; .\gradlew.bat clean build             # 132 testes
+.\gradlew.bat :lwjgl3:run "-Dmissaomarte.servidor=https://missao-marte-servidor.onrender.com"
+.\gradlew.bat :lwjgl3:zipApresentacao                 # pacote para outro Windows
+```
+
+O servidor publicado fica em `https://missao-marte-servidor.onrender.com`.
+Detalhes no [README da Fase 7](fases/fase-07-evolucao-livre/README.md) e em
+[APRESENTACAO.md](fases/fase-07-evolucao-livre/APRESENTACAO.md).
 
 ## Executar a Fase 6
 
@@ -255,8 +279,9 @@ permanece para a fase correspondente.
 
 ## Continuidade
 
-As Fases 1 a 5 foram aprovadas e implementadas; a Fase 6 foi implementada pela
-equipe e registrada depois, na revisão de 24/11/2026. A Fase 3 recebeu uma
+As Fases 1 a 5 e 7 foram aprovadas e implementadas; a Fase 6 foi implementada
+pela equipe e registrada depois, na revisão de 24/11/2026. A Fase 7 foi entregue
+em etapas (PRs #18 a #22) e publicada numa Release para a apresentação. A Fase 3 recebeu uma
 reformulação visual autorizada em 16/11/2026, e a Fase 5 segue o enunciado do
 professor (modo convidado mantido). Novas etapas continuam exigindo
 planejamento e aprovação, com revisão por pull request antes de integrar na master.
