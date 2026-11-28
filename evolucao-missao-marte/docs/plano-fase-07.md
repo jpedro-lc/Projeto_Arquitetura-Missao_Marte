@@ -208,3 +208,29 @@ Eclipse Temurin 17.
 | D3 | Rankings | Uma tabela por dificuldade em cada modo, ordenada por pontos |
 | D4 | Infinito só no tempo real | Confirmado |
 | D5 | Tiro e inimigo perseguidor | Fora desta fase por enquanto |
+
+## 11. Registro da entrega (28/11/2026)
+
+| Etapa | PR | Resultado |
+|---|---|---|
+| 7.1 Servidor no Render | #18 | No ar em `https://missao-marte-servidor.onrender.com`; cadastro, login, envio e ranking conferidos por `curl` |
+| 7.2 Tempo real | #19 | Padrão do jogo; Clássico mantido; `smokeTempoReal` com relógio real |
+| 7.3 Infinito e rankings | #20 | 9 tabelas por pontos; colunas `modo`/`setor` criadas no PostgreSQL e partida antiga migrada para `CLASSICO` |
+| Corações | #21 | Pedido do usuário durante a fase; corrigiu o HUD que só mostrava 3 vidas |
+| Pacote da apresentação e direcional | #22 | Pedidos do usuário: zip com Java embutido (`jlink` + `.bat`, porque o `.exe` do `jpackage` era bloqueado pelo Smart App Control) e controles translúcidos só no celular |
+
+Release: [v7.0-apresentacao](https://github.com/jpedro-lc/Projeto_Arquitetura-Missao_Marte/releases/tag/v7.0-apresentacao).
+
+**Validação final:** servidor com 41 testes e cliente com 132; `smokeDesktop`,
+`smokeOnline` (83 passos), `smokeTempoReal` e `smokeInfinito` passando; APK
+testado no Galaxy S20 FE contra o Render.
+
+**Fora do plano original:** os corações, o direcional na tela e o pacote da
+apresentação foram pedidos pelo usuário durante a fase, depois de aprovado o
+plano, e cada um entrou por pull request. Tiro e inimigo perseguidor ficaram de
+fora (decisão D5).
+
+**Divergência em testes antigos:** `smokeDesktop` e `smokeOnline` passaram a
+escolher "Clássico" antes de decolar, porque o padrão virou o tempo real. O
+roteiro verificado continua o mesmo.
+
