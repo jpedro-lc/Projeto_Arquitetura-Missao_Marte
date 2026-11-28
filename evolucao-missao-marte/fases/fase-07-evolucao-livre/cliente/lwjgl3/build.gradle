@@ -99,3 +99,66 @@ tasks.register('smokeOnline', JavaExec) {
     args layout.buildDirectory.dir('reports/smoke-online').get().asFile.absolutePath,
             System.getProperty('missaomarte.servidor', 'http://localhost:8080')
 }
+
+// Apresentação: pasta com o jogo, um Java 17 embutido (jlink) e "Jogar Missao Marte.bat", já apontando para o
+// servidor do Render. Roda em outro Windows sem instalar nada. Outro servidor: -PservidorPacote=https://...
+// Por que não um .exe do jpackage: o launcher gerado não é assinado e o Smart App Control do Windows 11 o bloqueia;
+// o javaw.exe copiado pelo jlink é o original do JDK, assinado pela Oracle.
+def servidorPacote = providers.gradleProperty('servidorPacote').getOrElse('https://missao-marte-servidor.onrender.com')
+def jdkPacote = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(17) }
+def pastaPacote = layout.buildDirectory.dir('pacote/MissaoMarte')
+
+tasks.register('runtimePacote', Exec) {
+    group = 'distribution'
+    description = 'Monta o Java 17 enxuto (jlink) do pacote da apresentação.'
+    def destino = layout.buildDirectory.dir('pacote-runtime')
+    outputs.dir(destino)
+    doFirst { delete destino }
+    executable = jdkPacote.map { it.metadata.installationPath.file('bin/jlink').asFile.absolutePath }.get()
+    // jdk.crypto.ec: HTTPS com o Render (TLS com curvas elípticas); jdk.unsupported: LWJGL.
+    args '--add-modules', 'java.se,jdk.unsupported,jdk.crypto.ec,jdk.crypto.cryptoki,jdk.zipfs,jdk.localedata',
+            '--no-header-files', '--no-man-pages', '--strip-debug', '--compress=2',
+            '--output', destino.get().asFile.absolutePath
+}
+
+tasks.register('pacoteApresentacao', Sync) {
+    group = 'distribution'
+    description = 'Gera build/pacote/MissaoMarte: jogo + Java embutido + atalho .bat para a apresentação.'
+    dependsOn tasks.named('installDist'), tasks.named('runtimePacote')
+    inputs.property('servidor', servidorPacote)
+    into pastaPacote
+    from(layout.buildDirectory.dir('install/lwjgl3/lib')) { into 'app' }
+    from(layout.buildDirectory.dir('pacote-runtime')) { into 'runtime' }
+    doLast {
+        def pasta = pastaPacote.get().asFile
+        // cd para a pasta do .bat: o ranking local do convidado fica ao lado do jogo.
+        new File(pasta, 'Jogar Missao Marte.bat').setText([
+                '@echo off',
+                'cd /d "%~dp0"',
+                'start "" "%~dp0runtime\\bin\\javaw.exe" -Dmissaomarte.servidor=' + servidorPacote + ' -cp "%~dp0app\\*" ' + application.mainClass.get(),
+        ].join('\r\n') + '\r\n', 'US-ASCII')
+        new File(pasta, 'LEIA-ME.txt').setText([
+                'MISSAO MARTE - versao da apresentacao (Fase 7)',
+                '',
+                '1. Extraia o .zip inteiro numa pasta (nao rode de dentro do .zip).',
+                '2. Clique duas vezes em "Jogar Missao Marte.bat".',
+                '   Nao precisa instalar Java: ele ja vem na pasta runtime.',
+                '',
+                "Servidor de ranking: ${servidorPacote}",
+                'O servidor gratuito dorme apos 15 min sem uso: o primeiro login pode levar ate 1 minuto.',
+                'Sem internet, o jogo funciona em modo convidado, com ranking local.',
+                '',
+                'Se o Windows mostrar "O Windows protegeu o computador", clique em',
+                '"Mais informacoes" e depois em "Executar assim mesmo".',
+        ].join('\r\n') + '\r\n', 'UTF-8')
+    }
+}
+
+tasks.register('zipApresentacao', Zip) {
+    group = 'distribution'
+    description = 'Compacta o pacote em build/distributions/MissaoMarte-windows.zip.'
+    dependsOn tasks.named('pacoteApresentacao')
+    from(layout.buildDirectory.dir('pacote'))
+    archiveFileName = 'MissaoMarte-windows.zip'
+    destinationDirectory = layout.buildDirectory.dir('distributions')
+}

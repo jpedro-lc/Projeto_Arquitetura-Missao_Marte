@@ -91,6 +91,10 @@ Android SDK 34 (minSdk 21) · JUnit 5 · MockMvc.
 
 ## ⚙️ Como executar a versão mais recente
 
+> **Sem instalar nada (apresentação):** `MissaoMarte-windows.zip` traz o jogo com
+> Java embutido, e o APK já aponta para o servidor na nuvem. Passo a passo em
+> [`APRESENTACAO.md`](evolucao-missao-marte/fases/fase-07-evolucao-livre/APRESENTACAO.md).
+
 Pré-requisitos: **JDK 17** e, para o Android, o **Android SDK** (Android Studio).
 Dentro de `evolucao-missao-marte/fases/fase-06-android/`:
 

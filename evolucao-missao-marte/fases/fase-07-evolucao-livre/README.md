@@ -12,6 +12,9 @@
 > O restante deste README descreve a base herdada da Fase 6 e será reescrito ao
 > fim da fase.
 
+> **Para a apresentação:** jogo pronto para outro Windows (Java embutido, sem
+> instalar nada) e APK apontando para a nuvem: veja [`APRESENTACAO.md`](APRESENTACAO.md).
+
 **Novidades da etapa 7.1:**
 - `GET /api/saude` público (verificação de saúde do Render e "acordar" o servidor).
 - Porta lida de `PORT`; banco PostgreSQL lido de `DATABASE_URL` (`UrlDoBanco`
