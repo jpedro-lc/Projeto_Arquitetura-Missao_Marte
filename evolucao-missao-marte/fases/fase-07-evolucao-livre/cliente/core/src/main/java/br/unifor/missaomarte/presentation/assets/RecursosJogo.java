@@ -50,6 +50,8 @@ public final class RecursosJogo implements Disposable {
     public static final String ERRO = "sounds/efeitos/erro_acao.ogg";
     private final AssetManager gerenciador = new AssetManager();
     private final Texture pixel;
+    private final Texture coracaoCheio = criarCoracao(true);
+    private final Texture coracaoVazio = criarCoracao(false);
     private final List<BitmapFont> fontes = new ArrayList<>();
     private final BitmapFont pequena;
     private final BitmapFont media;
@@ -105,6 +107,18 @@ public final class RecursosJogo implements Disposable {
         } finally { mapa.dispose(); }
     }
 
+    /** Vidas do HUD (Fase 7): desenho de DesenhoCoracao; o filtro Nearest padrão mantém os pixels nítidos ao ampliar. */
+    private static Texture criarCoracao(boolean cheio) {
+        Pixmap mapa = new Pixmap(DesenhoCoracao.LARGURA, DesenhoCoracao.ALTURA, Pixmap.Format.RGBA8888);
+        try {
+            mapa.setBlending(Pixmap.Blending.None);
+            for (int y = 0; y < DesenhoCoracao.ALTURA; y++) {
+                for (int x = 0; x < DesenhoCoracao.LARGURA; x++) mapa.drawPixel(x, y, DesenhoCoracao.cor(x, y, cheio));
+            }
+            return new Texture(mapa);
+        } finally { mapa.dispose(); }
+    }
+
     public static String explosao(int frame) { return SPACE + "Explosions/explosion_1_" + (frame < 10 ? "0" : "") + frame + ".png"; }
     public static String propulsor(int frame) { return SPACE + "FX/exhaust_0" + frame + ".png"; }
     public static String astronauta(int frame) { return UI + "astronauts/astronaut_idle_0" + frame + ".png"; }
@@ -113,6 +127,7 @@ public final class RecursosJogo implements Disposable {
     public Sound som(String caminho) { return gerenciador.get(caminho, Sound.class); }
     public Music musica(String caminho) { return gerenciador.get(caminho, Music.class); }
     public Texture pixel() { return pixel; }
+    public Texture coracao(boolean cheio) { return cheio ? coracaoCheio : coracaoVazio; }
     public BitmapFont pequena() { return pequena; }
     public BitmapFont media() { return media; }
     public BitmapFont titulo() { return titulo; }
@@ -130,6 +145,8 @@ public final class RecursosJogo implements Disposable {
     @Override public void dispose() {
         for (BitmapFont fonte : fontes) fonte.dispose();
         pixel.dispose();
+        coracaoCheio.dispose();
+        coracaoVazio.dispose();
         gerenciador.dispose();
     }
 }

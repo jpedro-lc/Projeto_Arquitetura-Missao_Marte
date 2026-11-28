@@ -76,6 +76,12 @@
 - Verificação com janela real: `.\gradlew.bat :lwjgl3:smokeInfinito`
   (capturas em [`docs/evidencias/infinito/`](docs/evidencias/infinito/)).
 
+**Vidas com corações:** o HUD troca as mini-naves por corações pixel-art
+desenhados por código (`DesenhoCoracao`, sem imagem de terceiros). Cheios são
+vidas; vazios, as perdidas. Aparecem até 5 (o máximo do Infinito), o que também
+corrige o HUD antigo, que só tinha 3 espaços. Capturas em
+[`docs/evidencias/coracoes/`](docs/evidencias/coracoes/).
+
 ## Base herdada da Fase 6
 
 O jogo LibGDX evoluiu para um ecossistema **multiplataforma (Desktop e Android)**
@@ -131,7 +137,7 @@ cd servidor
 
 ```powershell
 cd cliente
-.\gradlew.bat test                      # 126 testes JUnit (core + lwjgl3)
+.\gradlew.bat test                      # 129 testes JUnit (core + lwjgl3)
 .\gradlew.bat :lwjgl3:run --console=plain
 ```
 

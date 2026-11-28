@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Scaling;
 import br.unifor.missaomarte.model.EstadoPartida;
 import br.unifor.missaomarte.presentation.assets.RecursosJogo;
@@ -15,10 +16,16 @@ public final class HudPartida extends Table {
     private final Label movimentos;
     private final Label tempo;
     private final Label passageiros;
-    private final Image[] vidas = new Image[3];
+    /** Até 5 corações (o máximo do modo Infinito); os vazios mostram as vidas perdidas. */
+    private final Image[] vidas = new Image[HudDados.CORACOES_MAXIMOS];
+    private final TextureRegionDrawable cheio;
+    private final TextureRegionDrawable vazio;
+    private int picoDeVidas;
 
     public HudPartida(RecursosJogo recursos) {
         var estilo = new EstiloInterface(recursos);
+        cheio = new TextureRegionDrawable(new TextureRegion(recursos.coracao(true)));
+        vazio = new TextureRegionDrawable(new TextureRegion(recursos.coracao(false)));
         pontos = valor(estilo, "hud-pontos");
         dificuldade = valor(estilo, "hud-dificuldade");
         movimentos = valor(estilo, "hud-movimentos");
@@ -41,9 +48,10 @@ public final class HudPartida extends Table {
         inferior.pad(6, 34, 6, 34);
         inferior.add(estilo.texto("VIDAS")).padRight(16);
         for (int i = 0; i < vidas.length; i++) {
-            vidas[i] = new Image(recursos.textura(RecursosJogo.NAVE));
+            vidas[i] = new Image(cheio);
+            vidas[i].setName("hud-vida-" + (i + 1));
             vidas[i].setScaling(Scaling.fit);
-            inferior.add(vidas[i]).size(32, 32).padRight(6);
+            inferior.add(vidas[i]).size(30, 28).padRight(6);
         }
         inferior.add().expandX();
         var icone = new Image(new TextureRegion(recursos.textura(RecursosJogo.astronauta(1))));
@@ -68,6 +76,27 @@ public final class HudPartida extends Table {
         movimentos.setText(dados.movimentos());
         tempo.setText(dados.tempo());
         passageiros.setText(dados.resgatados() + "/" + dados.total());
-        for (int i = 0; i < vidas.length; i++) vidas[i].setVisible(i < dados.vidas());
+        picoDeVidas = Math.max(picoDeVidas, dados.vidas());
+        int espacos = HudDados.espacosDeVida(dados.vidas(), picoDeVidas);
+        for (int i = 0; i < vidas.length; i++) {
+            vidas[i].setVisible(i < espacos);
+            vidas[i].setDrawable(i < dados.vidas() ? cheio : vazio);
+        }
+    }
+
+    /** Nova partida na mesma tela: esquece o pico de vidas da anterior. */
+    public void reiniciar() { picoDeVidas = 0; }
+
+    /** Para as verificações com janela: quantos corações estão cheios e quantos aparecem. */
+    public int coracoesCheios() {
+        int n = 0;
+        for (Image v : vidas) if (v.isVisible() && v.getDrawable() == cheio) n++;
+        return n;
+    }
+
+    public int coracoesVisiveis() {
+        int n = 0;
+        for (Image v : vidas) if (v.isVisible()) n++;
+        return n;
     }
 }
