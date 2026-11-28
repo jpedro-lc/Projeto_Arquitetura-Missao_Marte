@@ -5,8 +5,8 @@
 >
 > | Etapa | Conteúdo | Situação |
 > |---|---|---|
-> | 7.1 | Servidor publicado no **Render** (Docker + PostgreSQL) | Pronta para o deploy ([`servidor/DEPLOY.md`](servidor/DEPLOY.md)) |
-> | 7.2 | Jogo em **tempo real** (modo clássico por turnos mantido) | Não iniciada |
+> | 7.1 | Servidor publicado no **Render** (Docker + PostgreSQL) | No ar em `https://missao-marte-servidor.onrender.com` ([`servidor/DEPLOY.md`](servidor/DEPLOY.md)) |
+> | 7.2 | Jogo em **tempo real** (modo clássico por turnos mantido) | Pronta (ver abaixo) |
 > | 7.3 | Modo **Infinito** e rankings por modo e dificuldade | Não iniciada |
 >
 > O restante deste README descreve a base herdada da Fase 6 e será reescrito ao
@@ -20,6 +20,32 @@
   serviço web gratuito e o banco gratuito.
 - O jogo acorda o servidor ao abrir e espera até 70 s pela resposta
   (antes 8 s), com o aviso "Conectando... pode levar até 1 min." no login.
+
+**Novidades da etapa 7.2 (tempo real):**
+
+| | Tempo real (padrão) | Clássico (turnos, igual à Fase 6) |
+|---|---|---|
+| Início | Contagem 3, 2, 1, VAI! | Imediato |
+| Nave | 1 casa a cada 0,15 s **enquanto a direção estiver pressionada** (teclado, D-Pad ou botão na tela) | 1 casa por toque/tecla |
+| Inimigos | Andam sozinhos: 0,9 s / 0,7 s / 0,5 s por passo (Fácil/Médio/Difícil) | A cada jogada |
+| Pontos | −1 por segundo | −1 por movimento |
+| Embarque | Automático ao passar pelo passageiro (a tecla C continua valendo) | Tecla C / botão Embarcar |
+| Colisão | −1 vida e 1,5 s de proteção | −1 vida |
+
+- O modo é escolhido na **Nova partida** (setas cima/baixo ou `Tab`, ou toque).
+- Regras em `service/TempoRealService` (sem `com.badlogic`), com o tempo do
+  quadro recebido por parâmetro e limitado a 0,1 s; `RitmoTempoReal` guarda os
+  valores de balanceamento.
+- **Strategy:** `RegrasDePartida` é o contrato dos modos; `RegrasClassicas`
+  adapta o `JogoService` das fases anteriores, que só ganhou o getter
+  `ranking()` para o tempo real gravar no mesmo ranking local.
+- Pausa (botão, `P` ou app em segundo plano) congela o tempo real.
+- Até a etapa 7.3, o servidor ainda não recebe o modo: vitórias dos dois modos
+  entram no mesmo ranking global.
+- Os roteiros `smokeDesktop` e `smokeOnline` agora escolhem **Clássico** antes
+  de decolar (o padrão mudou) e continuam verificando o modo por turnos.
+- Verificação com janela e relógio reais: `.\gradlew.bat :lwjgl3:smokeTempoReal`
+  (capturas em [`docs/evidencias/tempo-real/`](docs/evidencias/tempo-real/)).
 
 ## Base herdada da Fase 6
 
@@ -76,7 +102,7 @@ cd servidor
 
 ```powershell
 cd cliente
-.\gradlew.bat test                      # 84 testes JUnit (core + lwjgl3)
+.\gradlew.bat test                      # 106 testes JUnit (core + lwjgl3)
 .\gradlew.bat :lwjgl3:run --console=plain
 ```
 

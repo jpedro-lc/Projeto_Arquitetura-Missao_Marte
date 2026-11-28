@@ -53,6 +53,22 @@ tasks.register('smokeDesktop', JavaExec) {
             .getOrElse(layout.buildDirectory.dir('reports/smoke').get().asFile.absolutePath)
 }
 
+// Fase 7: janela e relógio reais; a partida em tempo real anda sozinha até a vitória.
+tasks.register('smokeTempoReal', JavaExec) {
+    group = 'verification'
+    description = 'Abre a janela e joga o modo tempo real: contagem, segurar direção, embarque automático, pausa e vitória.'
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'br.unifor.missaomarte.lwjgl3.VerificacaoTempoReal'
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+    jvmArgs application.applicationDefaultJvmArgs
+    workingDir = rootProject.projectDir
+    args providers.gradleProperty('smokeOutput')
+            .getOrElse(layout.buildDirectory.dir('reports/smoke-tempo-real').get().asFile.absolutePath)
+}
+
 // Ponta a ponta: exige o servidor no ar (cd ../servidor; gradlew bootRun). Gera as capturas da Fase 5.
 tasks.register('smokeOnline', JavaExec) {
     group = 'verification'

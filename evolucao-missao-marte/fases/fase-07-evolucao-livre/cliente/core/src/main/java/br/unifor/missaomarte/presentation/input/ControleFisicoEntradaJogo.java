@@ -12,13 +12,19 @@ import br.unifor.missaomarte.model.Acao;
  */
 public final class ControleFisicoEntradaJogo implements EntradaJogo {
     private final IntPredicate acabouDePressionar;
+    private final IntPredicate estaPressionada;
 
     public ControleFisicoEntradaJogo() {
-        this(codigo -> Gdx.input.isKeyJustPressed(codigo));
+        this(codigo -> Gdx.input.isKeyJustPressed(codigo), codigo -> Gdx.input.isKeyPressed(codigo));
     }
 
     public ControleFisicoEntradaJogo(IntPredicate acabouDePressionar) {
+        this(acabouDePressionar, codigo -> false);
+    }
+
+    public ControleFisicoEntradaJogo(IntPredicate acabouDePressionar, IntPredicate estaPressionada) {
         this.acabouDePressionar = Objects.requireNonNull(acabouDePressionar);
+        this.estaPressionada = Objects.requireNonNull(estaPressionada);
     }
 
     @Override
@@ -36,6 +42,16 @@ public final class ControleFisicoEntradaJogo implements EntradaJogo {
 
     private boolean pressionada(int codigo) {
         return acabouDePressionar.test(codigo);
+    }
+
+    /** Tempo real: segurar W/A/S/D, setas ou D-Pad mantém a nave andando. */
+    @Override
+    public Acao direcaoMantida() {
+        if (estaPressionada.test(Keys.W) || estaPressionada.test(Keys.DPAD_UP)) return Acao.CIMA;
+        if (estaPressionada.test(Keys.S) || estaPressionada.test(Keys.DPAD_DOWN)) return Acao.BAIXO;
+        if (estaPressionada.test(Keys.A) || estaPressionada.test(Keys.DPAD_LEFT)) return Acao.ESQUERDA;
+        if (estaPressionada.test(Keys.D) || estaPressionada.test(Keys.DPAD_RIGHT)) return Acao.DIREITA;
+        return Acao.VAZIA;
     }
 
     @Override

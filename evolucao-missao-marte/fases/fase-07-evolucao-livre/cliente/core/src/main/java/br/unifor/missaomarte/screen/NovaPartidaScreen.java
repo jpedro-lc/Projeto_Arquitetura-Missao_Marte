@@ -12,17 +12,20 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import br.unifor.missaomarte.MissaoMarteGame;
 import br.unifor.missaomarte.model.Dificuldade;
+import br.unifor.missaomarte.model.ModoJogo;
 import br.unifor.missaomarte.presentation.EstiloInterface;
 import br.unifor.missaomarte.presentation.HudDados;
 import br.unifor.missaomarte.presentation.assets.RecursosJogo;
 
-/** Convidado digita o nome; logado usa o nome da conta. Setas mudam a dificuldade, Enter decola. */
+/** Convidado digita o nome; logado usa o nome da conta. Setas mudam dificuldade e modo, Enter decola. */
 public final class NovaPartidaScreen extends TelaPainel {
     static final int NOME_MAX = 20;
     private final StringBuilder nome = new StringBuilder();
     private final Label campoNome;
     private final TextButton[] opcoes = new TextButton[Dificuldade.values().length];
     private Dificuldade dificuldade = Dificuldade.MEDIO;
+    private final TextButton[] modos = new TextButton[ModoJogo.values().length];
+    private ModoJogo modo = ModoJogo.TEMPO_REAL;
 
     public NovaPartidaScreen(MissaoMarteGame game, RecursosJogo recursos) {
         super(game, recursos, 760);
@@ -53,7 +56,15 @@ public final class NovaPartidaScreen extends TelaPainel {
             opcoes[d.ordinal()] = botao;
             linhaDificuldade.add(botao).size(190, 52).padRight(8);
         }
-        conteudo.add(linhaDificuldade).padBottom(18).row();
+        conteudo.add(linhaDificuldade).padBottom(10).row();
+        var linhaModo = new Table();
+        for (var m : ModoJogo.values()) {
+            var botao = botao(nomeModo(m), () -> escolherModo(m));
+            botao.setName("modo-" + m.name().toLowerCase());
+            modos[m.ordinal()] = botao;
+            linhaModo.add(botao).size(289, 52).padRight(8);
+        }
+        conteudo.add(linhaModo).padBottom(18).row();
         if (!logado) {
             var aviso = aviso("Modo convidado: a vitória vai para o ranking local.", EstiloInterface.CIANO);
             conteudo.add(aviso).padBottom(16).row();
@@ -62,7 +73,7 @@ public final class NovaPartidaScreen extends TelaPainel {
         botoes.add(botao("DECOLAR", this::decolar)).size(260, 56).padRight(12);
         botoes.add(botao("VOLTAR", () -> game.mostrarMenu())).size(260, 56);
         conteudo.add(botoes).padBottom(12).row();
-        var dica = estilo.texto("Setas mudam a dificuldade  •  Enter decola  •  Esc volta");
+        var dica = estilo.texto("Setas: dificuldade e modo  •  Enter decola  •  Esc volta");
         dica.setColor(0.6f, 0.82f, 0.88f, 1);
         conteudo.add(dica);
         stage.addListener(new InputListener() {
@@ -70,6 +81,7 @@ public final class NovaPartidaScreen extends TelaPainel {
             @Override public boolean keyDown(InputEvent event, int tecla) { return tecla(tecla); }
         });
         escolher(dificuldade);
+        escolherModo(modo);
     }
 
     private boolean digitar(char c) {
@@ -88,6 +100,7 @@ public final class NovaPartidaScreen extends TelaPainel {
         switch (tecla) {
             case Keys.LEFT -> escolher(Dificuldade.values()[(i + n - 1) % n]);
             case Keys.RIGHT -> escolher(Dificuldade.values()[(i + 1) % n]);
+            case Keys.UP, Keys.DOWN, Keys.TAB -> escolherModo(ModoJogo.values()[(modo.ordinal() + 1) % ModoJogo.values().length]);
             case Keys.ESCAPE, Keys.BACK -> game.mostrarMenu();
             default -> { return false; }
         }
@@ -101,9 +114,25 @@ public final class NovaPartidaScreen extends TelaPainel {
         }
     }
 
+    static String nomeModo(ModoJogo m) {
+        return switch (m) {
+            case TEMPO_REAL -> "TEMPO REAL";
+            case CLASSICO -> "CLÁSSICO (TURNOS)";
+        };
+    }
+
+    private void escolherModo(ModoJogo novo) {
+        modo = novo;
+        for (var m : ModoJogo.values()) {
+            modos[m.ordinal()].getLabel().setColor(m == novo ? EstiloInterface.LARANJA : Color.WHITE);
+        }
+    }
+
+    public ModoJogo modo() { return modo; }
+
     private void decolar() {
         if (Gdx.input != null) Gdx.input.setOnscreenKeyboardVisible(false);
-        game.iniciarPartida(nome.toString().trim(), dificuldade);
+        game.iniciarPartida(nome.toString().trim(), dificuldade, modo);
     }
 
     @Override public void hide() {

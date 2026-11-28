@@ -81,7 +81,8 @@ public final class VerificacaoDesktop {
                     if (f == 10) clicar(((MenuScreen) game.getScreen()).stage(), "VOLTAR");
                     if (f == 14) clicar(((MenuScreen) game.getScreen()).stage(), "INICIAR JOGO");
                     // Modo convidado: a tela de nova partida mantém o padrão (MÉDIO, piloto anônimo).
-                    if (game.getScreen() instanceof NovaPartidaScreen nova) { clicar(nova.stage(), "DECOLAR"); return; }
+                    // Fase 7: o padrão virou tempo real; este roteiro verifica o modo clássico, preservado.
+                    if (game.getScreen() instanceof NovaPartidaScreen nova) { clicar(nova.stage(), "modo-classico"); clicar(nova.stage(), "DECOLAR"); return; }
                     if (f < 15 || game.getScreen() instanceof MenuScreen) {
                         if (f == 370) exigir(jogo.consultarEstado().situacao() == Situacao.ABORTADA, "Menu não encerrou a missão");
                         if (f == 372) clicar(((MenuScreen) game.getScreen()).stage(), "INICIAR JOGO");
@@ -173,6 +174,10 @@ public final class VerificacaoDesktop {
     static void clicar(Stage stage, String nome) {
         Actor botao = procurar(stage.getRoot(), nome);
         exigir(botao != null, "Botão não encontrado: " + nome);
+        // Tela recém-aberta ainda não foi desenhada: diagrama de cima para baixo antes de medir o botão.
+        var linhagem = new java.util.ArrayDeque<Actor>();
+        for (Actor a = botao; a != null; a = a.getParent()) linhagem.push(a);
+        for (Actor a : linhagem) if (a instanceof com.badlogic.gdx.scenes.scene2d.utils.Layout diagramavel) diagramavel.validate();
         Vector2 ponto = botao.localToStageCoordinates(new Vector2(botao.getWidth() / 2, botao.getHeight() / 2));
         stage.stageToScreenCoordinates(ponto);
         stage.touchDown(Math.round(ponto.x), Math.round(ponto.y), 0, 0);
