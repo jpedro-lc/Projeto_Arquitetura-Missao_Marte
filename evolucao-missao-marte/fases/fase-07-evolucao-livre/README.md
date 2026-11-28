@@ -79,6 +79,12 @@
 - Verificação com janela real: `.\gradlew.bat :lwjgl3:smokeInfinito`
   (capturas em [`docs/evidencias/infinito/`](docs/evidencias/infinito/)).
 
+**Direcional na tela:** setas em cruz à esquerda do mapa (segurar mantém a
+nave andando no tempo real) e um botão **EMBARCAR** grande à direita, em colunas
+próprias para não cobrir o mapa; o rodapé ficou só com Abortar, Pausa e Menu.
+As setas também são desenhadas por código (`DesenhoSeta`). Capturas em
+[`docs/evidencias/direcional/`](docs/evidencias/direcional/).
+
 **Vidas com corações:** o HUD troca as mini-naves por corações pixel-art
 desenhados por código (`DesenhoCoracao`, sem imagem de terceiros). Cheios são
 vidas; vazios, as perdidas. Aparecem até 5 (o máximo do Infinito), o que também
@@ -140,7 +146,7 @@ cd servidor
 
 ```powershell
 cd cliente
-.\gradlew.bat test                      # 129 testes JUnit (core + lwjgl3)
+.\gradlew.bat test                      # 132 testes JUnit (core + lwjgl3)
 .\gradlew.bat :lwjgl3:run --console=plain
 ```
 

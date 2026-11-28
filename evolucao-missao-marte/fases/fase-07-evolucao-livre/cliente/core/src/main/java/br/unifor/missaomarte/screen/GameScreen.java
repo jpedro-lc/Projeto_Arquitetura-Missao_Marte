@@ -11,6 +11,9 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -61,7 +64,7 @@ public final class GameScreen extends ScreenAdapter {
     private float tempoVisual;
     private int geracao;
     /** Botões de direção: no tempo real, segurar mantém a nave andando. */
-    private final Map<Acao, TextButton> direcoes = new EnumMap<>(Acao.class);
+    private final Map<Acao, Button> direcoes = new EnumMap<>(Acao.class);
     private final Label contagem;
     /** Modo Infinito: "SETOR n" acima do mapa durante toda a corrida. */
     private final Label setor;
@@ -106,16 +109,28 @@ public final class GameScreen extends ScreenAdapter {
                 game.toque().deslizar(x - inicioX, y - inicioY);
             }
         });
-        raiz.add(ambiente).grow().pad(4, 0, 6, 0).row();
+        // Fase 7: direcional à esquerda e Embarcar à direita, em colunas próprias, para não cobrir o mapa
+        // (o mapa usa toda a largura que recebe). Pensado para o polegar no celular; no desktop o mouse também usa.
+        var direcional = new Table();
+        direcional.add();
+        direcional.add(botaoDirecao(recursos, "TOQUE_CIMA", Acao.CIMA)).size(84);
+        direcional.add().row();
+        direcional.add(botaoDirecao(recursos, "TOQUE_ESQUERDA", Acao.ESQUERDA)).size(84);
+        direcional.add().size(84);
+        direcional.add(botaoDirecao(recursos, "TOQUE_DIREITA", Acao.DIREITA)).size(84).row();
+        direcional.add();
+        direcional.add(botaoDirecao(recursos, "TOQUE_BAIXO", Acao.BAIXO)).size(84);
+        direcional.add();
+        var embarcar = botaoToque(estilo, "EMBARCAR", "TOQUE_EMBARCAR", () -> game.toque().acionar(Acao.EMBARCAR));
+        var meio = new Table();
+        meio.add(direcional).width(264).bottom().padBottom(24).padLeft(8).padRight(12);
+        meio.add(ambiente).grow();
+        meio.add(embarcar).size(200, 110).bottom().padBottom(70).padLeft(20).padRight(24);
+        raiz.add(meio).grow().pad(4, 0, 6, 0).row();
         var rodape = new Table();
         rodape.setBackground(recursos.painelRodape());
         rodape.pad(6, 20, 6, 20);
         // Controles interativos por toque (Android e mouse no Desktop): enfileiram intenções em ToqueEntradaJogo.
-        rodape.add(botaoDirecao(estilo, "ESQ", "TOQUE_ESQUERDA", Acao.ESQUERDA)).size(96, 44).padRight(6);
-        rodape.add(botaoDirecao(estilo, "CIMA", "TOQUE_CIMA", Acao.CIMA)).size(104, 44).padRight(6);
-        rodape.add(botaoDirecao(estilo, "BAIXO", "TOQUE_BAIXO", Acao.BAIXO)).size(112, 44).padRight(6);
-        rodape.add(botaoDirecao(estilo, "DIR", "TOQUE_DIREITA", Acao.DIREITA)).size(96, 44).padRight(18);
-        rodape.add(botaoToque(estilo, "EMBARCAR (C)", "TOQUE_EMBARCAR", () -> game.toque().acionar(Acao.EMBARCAR))).size(210, 44).padRight(8);
         rodape.add(botaoToque(estilo, "ABORTAR (Q)", "TOQUE_ABORTAR", () -> game.toque().acionar(Acao.ABORTAR))).size(196, 44).padRight(18);
         rodape.add(botaoToque(estilo, "PAUSA (P)", "TOQUE_PAUSA", () -> game.toque().solicitarPausa())).size(164, 44).padRight(8);
         rodape.add(botaoToque(estilo, "MENU", "TOQUE_MENU", () -> { game.audio().selecionar(); game.mostrarMenu(); })).size(130, 44);
@@ -328,9 +343,19 @@ public final class GameScreen extends ScreenAdapter {
     }
 
     /** Clássico: um passo por clique. Tempo real: o toque já move e segurar continua andando. */
-    private TextButton botaoDirecao(EstiloInterface estilo, String rotulo, String nomeAtor, Acao direcao) {
-        var botao = botaoToque(estilo, rotulo, nomeAtor, () -> {
-            if (controlador.modo() == ModoJogo.CLASSICO) game.toque().acionar(direcao);
+    private Button botaoDirecao(RecursosJogo recursos, String nomeAtor, Acao direcao) {
+        var estiloSeta = new ImageButton.ImageButtonStyle();
+        estiloSeta.up = recursos.botao(RecursosJogo.BOTAO_NORMAL);
+        estiloSeta.over = recursos.botao(RecursosJogo.BOTAO_SOBRE);
+        estiloSeta.down = recursos.botao(RecursosJogo.BOTAO_PRESSIONADO);
+        estiloSeta.imageUp = new TextureRegionDrawable(new TextureRegion(recursos.seta(direcao)));
+        var botao = new ImageButton(estiloSeta);
+        botao.setName(nomeAtor);
+        botao.getImageCell().size(44);
+        botao.addListener(new ClickListener() {
+            @Override public void clicked(InputEvent event, float x, float y) {
+                if (controlador.modo() == ModoJogo.CLASSICO) game.toque().acionar(direcao);
+            }
         });
         botao.addListener(new InputListener() {
             @Override public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
